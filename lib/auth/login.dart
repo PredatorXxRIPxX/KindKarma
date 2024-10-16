@@ -61,7 +61,6 @@ class _MyLoginPageState extends State<MyLoginPage> {
                       },
                     ),
                     const SizedBox(height: 15),
-                    // Password Field
                     TextFormField(
                       controller: _passwordController,
                       decoration: InputDecoration(
@@ -83,12 +82,11 @@ class _MyLoginPageState extends State<MyLoginPage> {
                       },
                     ),
                     const SizedBox(height: 15),
-                    // Forgot Password
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
                         onPressed: () {
-                          // Forgot password logic here
+                          Navigator.pushNamed(context, '/forgot');
                         },
                         child: const Text(
                           'Forgot Password?',
@@ -97,7 +95,6 @@ class _MyLoginPageState extends State<MyLoginPage> {
                       ),
                     ),
                     const SizedBox(height: 30),
-                    // Login Button
                     SizedBox(
                       width: isWideScreen ? 300 : double.infinity,
                       height: 50,
@@ -116,6 +113,7 @@ class _MyLoginPageState extends State<MyLoginPage> {
                         child: const Text(
                           'Login',
                           style: TextStyle(
+                            color: Colors.white,
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
@@ -123,14 +121,13 @@ class _MyLoginPageState extends State<MyLoginPage> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    // Don't have an account? Register link
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const Text("Don't have an account?"),
                         TextButton(
                           onPressed: () {
-                            // Navigate to register page
+                            Navigator.pushNamed(context, '/register');
                           },
                           child: const Text(
                             'Register',

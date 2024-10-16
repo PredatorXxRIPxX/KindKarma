@@ -141,6 +141,7 @@ class _MyRegisterPageState extends State<MyRegisterPage> {
                         child: const Text(
                           'Register',
                           style: TextStyle(
+                            color: Colors.white,
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
@@ -155,7 +156,7 @@ class _MyRegisterPageState extends State<MyRegisterPage> {
                         const Text("Already have an account?"),
                         TextButton(
                           onPressed: () {
-                            // Navigate to login page
+                            Navigator.pushReplacementNamed(context, '/login');
                           },
                           child: const Text(
                             'Sign In',
