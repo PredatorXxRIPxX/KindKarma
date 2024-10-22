@@ -1,148 +1,94 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 
-class MyLoginPage extends StatefulWidget {
-  const MyLoginPage({super.key});
+class Login extends StatefulWidget {
+  const Login({super.key});
 
   @override
-  State<MyLoginPage> createState() => _MyLoginPageState();
+  State<Login> createState() => _LoginState();
 }
 
-class _MyLoginPageState extends State<MyLoginPage> {
-  final _formKey = GlobalKey<FormState>();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-
+class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    bool isWideScreen = width > 600;
-
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
+      body: SafeArea(
+          child: Stack(
+        children: [
+          Lottie.asset('assets/waves.json',
+              width: double.infinity,
+              height: double.infinity,
+              fit: BoxFit.fill),
+          Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text(
-                'Welcome Back',
+            const Text('Login',
                 style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blueAccent,
-                ),
+                    color: Colors.white,
+                    fontSize: 50,
+                    fontWeight: FontWeight.bold)),
+            const SizedBox(height: 20),
+            const Text('Welcome back! Please login to your account',
+                style: TextStyle(color: Colors.white, fontSize: 15)),
+            const SizedBox(height: 20),
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 20),
+              child: TextFormField(
+                decoration: InputDecoration(
+                    prefixIcon: const Icon(Icons.email, color: Colors.white),
+                    hintText: 'Email',
+                    hintStyle: const TextStyle(color: Colors.white),
+                    
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                        borderSide: BorderSide(color: Colors.white))),
               ),
-              const SizedBox(height: 20),
-              Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    // Email Field
-                    TextFormField(
-                      controller: _emailController,
-                      decoration: InputDecoration(
-                        labelText: 'Email',
-                        prefixIcon: const Icon(Icons.email),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      keyboardType: TextInputType.emailAddress,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your email';
-                        }
-                        if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                            .hasMatch(value)) {
-                          return 'Please enter a valid email';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 15),
-                    TextFormField(
-                      controller: _passwordController,
-                      decoration: InputDecoration(
-                        labelText: 'Password',
-                        prefixIcon: const Icon(Icons.lock),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      obscureText: true,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your password';
-                        }
-                        if (value.length < 6) {
-                          return 'Password must be at least 6 characters long';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 15),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton(
-                        onPressed: () {
-                          Navigator.pushNamed(context, '/forgot');
-                        },
-                        child: const Text(
-                          'Forgot Password?',
-                          style: TextStyle(color: Colors.blueAccent),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 30),
-                    SizedBox(
-                      width: isWideScreen ? 300 : double.infinity,
-                      height: 50,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            // Login logic here
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blueAccent,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: const Text(
-                          'Login',
-                          style: TextStyle(
+            ),
+            const SizedBox(height: 20),
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 20),
+              child: TextFormField(
+                
+                decoration: InputDecoration(
+                    prefixIcon: const Icon(Icons.lock, color: Colors.white),
+                    hintText: 'Password',
+                    fillColor: Colors.white,
+                    hintStyle: const TextStyle(color: Colors.white),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                        borderSide: BorderSide(color: Colors.white))),
+              ),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+                onPressed: () {},
+                child:  Text('Login',style: TextStyle(color: Colors.white)),
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black26,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 100, vertical: 20),
+                    textStyle: const TextStyle(
+                        fontSize: 20, fontWeight: FontWeight.bold,color: Colors.white))),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text('Don\'t have an account?',
+                    style: TextStyle(color: Colors.white)),
+                TextButton(
+                    onPressed: () {},
+                    child: const Text('Register',
+                        style: TextStyle(
                             color: Colors.white,
-                            fontSize: 18,
                             fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text("Don't have an account?"),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pushNamed(context, '/register');
-                          },
-                          child: const Text(
-                            'Register',
-                            style: TextStyle(color: Colors.blueAccent),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
+                            fontSize: 15))),
+              ],
+            )
+          ]
+          
           ),
-        ),
-      ),
+        ],
+      )),
     );
   }
 }
