@@ -19,9 +19,7 @@ class _LoginState extends State<Login> {
               width: double.infinity,
               height: double.infinity,
               fit: BoxFit.fill),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
+          Column(mainAxisAlignment: MainAxisAlignment.center, children: [
             const Text('Login',
                 style: TextStyle(
                     color: Colors.white,
@@ -38,17 +36,17 @@ class _LoginState extends State<Login> {
                     prefixIcon: const Icon(Icons.email, color: Colors.white),
                     hintText: 'Email',
                     hintStyle: const TextStyle(color: Colors.white),
-                    
+                    fillColor: Colors.white,
+                    focusColor: Colors.black26,
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(30),
-                        borderSide: BorderSide(color: Colors.white))),
+                        borderSide: const BorderSide(color: Colors.white))),
               ),
             ),
             const SizedBox(height: 20),
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 20),
               child: TextFormField(
-                
                 decoration: InputDecoration(
                     prefixIcon: const Icon(Icons.lock, color: Colors.white),
                     hintText: 'Password',
@@ -56,19 +54,21 @@ class _LoginState extends State<Login> {
                     hintStyle: const TextStyle(color: Colors.white),
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(30),
-                        borderSide: BorderSide(color: Colors.white))),
+                        borderSide: const BorderSide(color: Colors.white))),
               ),
             ),
             const SizedBox(height: 20),
             ElevatedButton(
                 onPressed: () {},
-                child:  Text('Login',style: TextStyle(color: Colors.white)),
                 style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.black26,
                     padding: const EdgeInsets.symmetric(
                         horizontal: 100, vertical: 20),
                     textStyle: const TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.bold,color: Colors.white))),
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white)),
+                child: const Text('Login', style: TextStyle(color: Colors.white))),
             const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -84,9 +84,7 @@ class _LoginState extends State<Login> {
                             fontSize: 15))),
               ],
             )
-          ]
-          
-          ),
+          ]),
         ],
       )),
     );
