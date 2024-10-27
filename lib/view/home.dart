@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:kindkarma/utils/utility.dart';
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
 
@@ -37,28 +37,31 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.black38,
+        backgroundColor: Colors.black,
+        selectedLabelStyle: TextStyle(color: Color(color_green)),
+        unselectedLabelStyle: TextStyle(color: Color(color_white)),
         currentIndex: currentPage,
         onTap: (value){
           setState(() {
             currentPage = value;
           });
         },
-        items: const <BottomNavigationBarItem>[
+        items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined, color: Colors.white),
+            icon: Icon(Icons.home_outlined, color: Color(color_green)),
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.share_location_outlined, color: Colors.white),
+            icon: Icon(Icons.share_location_outlined, color: Color(color_green)),
             label: 'Favourite',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.search_outlined, color: Colors.white),
+            icon: Icon(Icons.search_outlined, color: Color(color_green)),
             label: 'Search',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline, color: Colors.white),
+            
+            icon: Icon(Icons.person_outline, color: Color(color_green)),
             label: 'Profile',
           ),
         ],

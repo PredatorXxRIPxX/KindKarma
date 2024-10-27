@@ -10,6 +10,11 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   bool isVisible = false;
+  void login() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Logged in successfully')),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -115,7 +120,12 @@ class _LoginState extends State<Login> {
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    login();
+                    Future.delayed(const Duration(milliseconds: 2000), () {
+                      Navigator.pushReplacementNamed(context, '/home');
+                    });
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.black26,
                     padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 20),

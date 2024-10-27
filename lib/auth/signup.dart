@@ -107,7 +107,9 @@ class _SignUpState extends State<SignUp> {
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pushReplacementNamed(context, '/login'); 
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.black26,
                     padding: const EdgeInsets.symmetric(
@@ -133,7 +135,7 @@ class _SignUpState extends State<SignUp> {
                     ),
                     TextButton(
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, '/login'); // Navigate back to Login
+                        Navigator.pushReplacementNamed(context, '/login'); 
                       },
                       child: const Text(
                         'Login',
