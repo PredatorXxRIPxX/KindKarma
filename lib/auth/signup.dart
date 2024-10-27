@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
-class Login extends StatefulWidget {
-  const Login({super.key});
+class SignUp extends StatefulWidget {
+  const SignUp({super.key});
 
   @override
-  State<Login> createState() => _LoginState();
+  State<SignUp> createState() => _SignUpState();
 }
 
-class _LoginState extends State<Login> {
-  bool isVisible = false;
-
+class _SignUpState extends State<SignUp> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,7 +25,7 @@ class _LoginState extends State<Login> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Text(
-                  'Login',
+                  'Sign Up',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 50,
@@ -36,7 +34,7 @@ class _LoginState extends State<Login> {
                 ),
                 const SizedBox(height: 20),
                 const Text(
-                  'Welcome back! Please login to your account',
+                  'Create an account to get started',
                   style: TextStyle(color: Colors.white, fontSize: 15),
                 ),
                 const SizedBox(height: 20),
@@ -45,8 +43,8 @@ class _LoginState extends State<Login> {
                   child: TextFormField(
                     style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
-                      filled: true, // Enable fill color
-                      fillColor: Colors.black38, // Set background color
+                      filled: true,
+                      fillColor: Colors.black38,
                       prefixIcon: const Icon(Icons.email, color: Colors.white),
                       hintText: 'Email',
                       hintStyle: const TextStyle(color: Colors.white),
@@ -66,22 +64,35 @@ class _LoginState extends State<Login> {
                   margin: const EdgeInsets.symmetric(horizontal: 20),
                   child: TextFormField(
                     style: const TextStyle(color: Colors.white),
-                    obscureText: !isVisible,
+                    obscureText: true,
                     decoration: InputDecoration(
-                      filled: true, // Enable fill color
-                      fillColor: Colors.black38, // Set background color
+                      filled: true,
+                      fillColor: Colors.black38,
                       prefixIcon: const Icon(Icons.lock, color: Colors.white),
-                      suffixIcon: IconButton(
-                        onPressed: () {
-                          setState(() {
-                            isVisible = !isVisible;
-                          });
-                        },
-                        icon: isVisible
-                            ? const Icon(Icons.visibility, color: Colors.white)
-                            : const Icon(Icons.visibility_off, color: Colors.white),
-                      ),
                       hintText: 'Password',
+                      hintStyle: const TextStyle(color: Colors.white),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                        borderSide: const BorderSide(color: Colors.white),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                        borderSide: const BorderSide(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 20),
+                  child: TextFormField(
+                    style: const TextStyle(color: Colors.white),
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.black38,
+                      prefixIcon: const Icon(Icons.lock, color: Colors.white),
+                      hintText: 'Confirm Password',
                       hintStyle: const TextStyle(color: Colors.white),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(30),
@@ -99,7 +110,8 @@ class _LoginState extends State<Login> {
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.black26,
-                    padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 20),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 100, vertical: 20),
                     textStyle: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -107,7 +119,7 @@ class _LoginState extends State<Login> {
                     ),
                   ),
                   child: const Text(
-                    'Login',
+                    'Sign Up',
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
@@ -116,15 +128,15 @@ class _LoginState extends State<Login> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
-                      'Don\'t have an account?',
+                      'Already have an account?',
                       style: TextStyle(color: Colors.white),
                     ),
                     TextButton(
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, '/signup');
+                        Navigator.pushReplacementNamed(context, '/login'); // Navigate back to Login
                       },
                       child: const Text(
-                        'Register',
+                        'Login',
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
