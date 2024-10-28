@@ -66,7 +66,7 @@ class _ForgotPasswordState extends State<ForgotPassword>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Forgot Password'),
+        title: const Text('Forgot Password', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.black87,
       ),
       body: SafeArea(
@@ -137,7 +137,7 @@ class _ForgotPasswordState extends State<ForgotPassword>
                 const SizedBox(height: 20),
                 TextButton(
                   onPressed: () {
-                    Navigator.pop(context);
+                    Navigator.pushReplacementNamed(context, '/login');
                   },
                   child: const Text(
                     'Back to Login',

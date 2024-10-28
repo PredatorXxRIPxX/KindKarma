@@ -45,6 +45,28 @@ class _SignUpState extends State<SignUp> {
                     decoration: InputDecoration(
                       filled: true,
                       fillColor: Colors.black38,
+                      prefixIcon: const Icon(Icons.person, color: Colors.white),
+                      hintText: 'UserName',
+                      hintStyle: const TextStyle(color: Colors.white),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                        borderSide: const BorderSide(color: Colors.white),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                        borderSide: const BorderSide(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 20),
+                  child: TextFormField(
+                    style: const TextStyle(color: Colors.white),
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.black38,
                       prefixIcon: const Icon(Icons.email, color: Colors.white),
                       hintText: 'Email',
                       hintStyle: const TextStyle(color: Colors.white),
