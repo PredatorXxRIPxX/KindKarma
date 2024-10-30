@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:animated_notch_bottom_bar/animated_notch_bottom_bar/animated_notch_bottom_bar.dart';
+import 'package:kindkarma/view/profile.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -333,19 +334,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _buildProfilePage() {
-    return Container(
-      color: darkBackground,
-      child: const Center(
-        child: Text(
-          'Profile',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-    );
+    return const Profile();
   }
 
   Widget _buildBottomBar() {
