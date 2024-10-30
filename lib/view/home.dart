@@ -6,7 +6,6 @@ import 'package:kindkarma/view/mainpage.dart';
 import 'package:kindkarma/view/notificationpage.dart';
 import 'package:kindkarma/view/search.dart';
 
-
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
 
@@ -14,59 +13,89 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int currentPage = 0;
-  final PageController _pageController = PageController(initialPage: 0);
+class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateMixin {
+  static const double _kBottomBarHeight = 75;
+  static const double _kBottomRadius = 28;
+  static const double _kIconSize = 24;
+  static const Duration _kAnimationDuration = Duration(milliseconds: 300);
+  
+  late final PageController _pageController;
+  late final NotchBottomBarController _bottomBarController;
+  
+  int _currentPage = 0;
+  bool _isPageViewAnimating = false;
 
-  // Custom colors
-  static const Color primaryGreen = Color(0xFF4CAF50);
-  static const Color darkBackground = Color(0xFF121212);
-  static const Color surfaceColor = Color(0xFF1E1E1E);
-  static const Color accentColor = Color(0xFF2E7D32);
-  static const Color cardColor = Color(0xFF252525);
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: _currentPage);
+    _bottomBarController = NotchBottomBarController(index: _currentPage);
+  }
 
   @override
   void dispose() {
     _pageController.dispose();
+    _bottomBarController.dispose();
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: darkBackground,
-      appBar: _buildAppBar(),
-      body: PageView(
-        controller: _pageController,
-        onPageChanged: (value) => setState(() => currentPage = value),
-        children: const [
-          Mainpage(),
-          Search(),
-          Addcontent(),
-          Notificationpage(),
-          Profile(),
-        ],
-      ),
-      extendBody: true,
-      bottomNavigationBar: _buildBottomBar(),
-    );
+
+  final List<Widget> _pages = const [
+    Mainpage(),
+    Search(),
+    Addcontent(),
+    Notificationpage(),
+    Profile(),
+  ];
+
+
+  final List<({IconData activeIcon, IconData inactiveIcon, String label})> _navigationItems = const [
+    (activeIcon: Icons.home_rounded, inactiveIcon: Icons.home_outlined, label: 'Home'),
+    (activeIcon: Icons.search_rounded, inactiveIcon: Icons.search_outlined, label: 'Search'),
+    (activeIcon: Icons.add_circle_rounded, inactiveIcon: Icons.add_circle_outline_rounded, label: 'Add'),
+    (activeIcon: Icons.notifications_rounded, inactiveIcon: Icons.notifications_outlined, label: 'Notifications'),
+    (activeIcon: Icons.person_rounded, inactiveIcon: Icons.person_outline_rounded, label: 'Profile'),
+  ];
+
+  Future<void> _handlePageChange(int index) async {
+    if (_isPageViewAnimating) return;
+    
+    setState(() {
+      _isPageViewAnimating = true;
+      _currentPage = index;
+    });
+
+    try {
+      await _pageController.animateToPage(
+        index,
+        duration: _kAnimationDuration,
+        curve: Curves.easeInOut,
+      );
+    } catch (e) {
+      debugPrint('Error during page animation: $e');
+    } finally {
+      if (mounted) {
+        setState(() => _isPageViewAnimating = false);
+      }
+    }
   }
 
-  AppBar _buildAppBar() {
+  PreferredSizeWidget _buildAppBar() {
     return AppBar(
       elevation: 0,
+      backgroundColor: ThemeColors.surfaceColor,
       title: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: accentColor.withOpacity(0.1),
+              color: ThemeColors.accentColor.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: accentColor.withOpacity(0.3)),
+              border: Border.all(color: ThemeColors.accentColor.withOpacity(0.3)),
             ),
             child: const Icon(
               Icons.volunteer_activism,
-              color: primaryGreen,
+              color: ThemeColors.primaryGreen,
               size: 24,
             ),
           ),
@@ -82,44 +111,51 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
       ),
-      backgroundColor: surfaceColor,
       actions: [
-        IconButton(
-          icon: Stack(
-            children: [
-              const Icon(
-                Icons.message_outlined,
-                color: Colors.white,
-                size: 24,
-              ),
-              Positioned(
-                right: 0,
-                top: 0,
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: const BoxDecoration(
-                    color: primaryGreen,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Text(
-                    '2',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          onPressed: () => print("Message tapped"),
-        ),
+        _buildMessageButton(),
         const SizedBox(width: 12),
       ],
     );
   }
 
+  Widget _buildMessageButton() {
+    return Stack(
+      children: [
+        IconButton(
+          icon: const Icon(
+            Icons.message_outlined,
+            color: Colors.white,
+            size: 24,
+          ),
+          onPressed: () => _handleMessageTap(),
+        ),
+        Positioned(
+          right: 8,
+          top: 8,
+          child: Container(
+            padding: const EdgeInsets.all(4),
+            decoration: const BoxDecoration(
+              color: ThemeColors.primaryGreen,
+              shape: BoxShape.circle,
+            ),
+            child: const Text(
+              '2',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _handleMessageTap() {
+    
+    debugPrint('Message button tapped');
+  }
 
   Widget _buildBottomBar() {
     return Container(
@@ -129,34 +165,23 @@ class _MyHomePageState extends State<MyHomePage> {
           end: Alignment.bottomCenter,
           colors: [
             Colors.transparent,
-            darkBackground.withOpacity(0.9),
+            ThemeColors.darkBackground.withOpacity(0.9),
           ],
         ),
       ),
       child: AnimatedNotchBottomBar(
-        color: surfaceColor,
-        durationInMilliSeconds: 300,
-        notchBottomBarController: NotchBottomBarController(index: currentPage),
+        color: ThemeColors.surfaceColor,
+        durationInMilliSeconds: _kAnimationDuration.inMilliseconds,
+        notchBottomBarController: _bottomBarController,
         blurOpacity: 0,
-        bottomBarHeight: 75,
-        onTap: (value) {
-          setState(() => currentPage = value);
-          _pageController.animateToPage(
-            value,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-          );
-        },
-        kBottomRadius: 28,
-        kIconSize: 24,
+        bottomBarHeight: _kBottomBarHeight,
         bottomBarWidth: MediaQuery.of(context).size.width,
-        bottomBarItems: [
-          _buildBottomBarItem(Icons.home_rounded, Icons.home_outlined),
-          _buildBottomBarItem(Icons.search_rounded, Icons.search_outlined),
-          _buildBottomBarItem(Icons.add_circle_rounded, Icons.add_circle_outline_rounded),
-          _buildBottomBarItem(Icons.notifications_rounded, Icons.notifications_outlined),
-          _buildBottomBarItem(Icons.person_rounded, Icons.person_outline_rounded),
-        ],
+        kBottomRadius: _kBottomRadius,
+        kIconSize: _kIconSize,
+        onTap: _handlePageChange,
+        bottomBarItems: _navigationItems
+            .map((item) => _buildBottomBarItem(item.activeIcon, item.inactiveIcon))
+            .toList(),
       ),
     );
   }
@@ -169,9 +194,36 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       activeItem: Icon(
         activeIcon,
-        color: primaryGreen,
+        color: ThemeColors.primaryGreen,
       ),
       itemLabel: '',
     );
   }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: ThemeColors.darkBackground,
+      appBar: _buildAppBar(),
+      body: PageView(
+        controller: _pageController,
+        physics: const NeverScrollableScrollPhysics(),
+        onPageChanged: (index) => setState(() => _currentPage = index),
+        children: _pages,
+      ),
+      extendBody: true,
+      bottomNavigationBar: _buildBottomBar(),
+    );
+  }
+}
+
+// Theme colors moved to a separate class for better organization
+class ThemeColors {
+  static const Color primaryGreen = Color(0xFF4CAF50);
+  static const Color darkBackground = Color(0xFF121212);
+  static const Color surfaceColor = Color(0xFF1E1E1E);
+  static const Color accentColor = Color(0xFF2E7D32);
+  static const Color cardColor = Color(0xFF252525);
+
+  const ThemeColors._(); // Private constructor to prevent instantiation
 }
