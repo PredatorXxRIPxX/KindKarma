@@ -14,8 +14,11 @@ class NotificationCard extends StatelessWidget {
   String _getTimeAgo() {
     final now = DateTime.now();
     final difference = now.difference(time);
-
-    if (difference.inDays > 0) {
+    if (difference.inDays > 365) {
+      return '${(difference.inDays / 365).floor()}y ago';
+    } else if (difference.inDays > 30) {
+      return '${(difference.inDays / 30).floor()}mo ago';
+    } else if (difference.inDays > 0) {
       return '${difference.inDays}d ago';
     } else if (difference.inHours > 0) {
       return '${difference.inHours}h ago';
@@ -29,7 +32,7 @@ class NotificationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 4),
+      margin: const EdgeInsets.symmetric(vertical: 10,horizontal: 20),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.grey[900],
