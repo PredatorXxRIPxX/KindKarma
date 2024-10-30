@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:kindkarma/aside/about.dart';
+import 'package:kindkarma/aside/changedetails.dart';
+import 'package:kindkarma/aside/contactus.dart';
+import 'package:kindkarma/aside/termcondition.dart';
 
 class Settings extends StatefulWidget {
   const Settings({super.key});
@@ -29,52 +33,28 @@ class _SettingsState extends State<Settings> {
               title: const Text('change Details'),
               trailing: const Icon(Icons.arrow_forward_ios),
               onTap: () {
-                showAboutDialog(
-                  context: context,
-                  applicationName: 'Kind Karma',
-                  applicationVersion: '1.0.0',
-                  applicationIcon: const Icon(Icons.favorite),
-                  applicationLegalese: '© 2021 Kind Karma',
-                );
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const DetailsPage()));
               },
             ),
             ListTile(
               title: const Text('Contact Us'),
               trailing: const Icon(Icons.arrow_forward_ios),
               onTap: () {
-                showAboutDialog(
-                  context: context,
-                  applicationName: 'Kind Karma',
-                  applicationVersion: '1.0.0',
-                  applicationIcon: const Icon(Icons.favorite),
-                  applicationLegalese: '© 2021 Kind Karma',
-                );
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const Contactus()));
               },
             ),
             ListTile(
               title: const Text('Terms and Conditions'),
               trailing: const Icon(Icons.arrow_forward_ios),
               onTap: (){
-                showAboutDialog(
-                  context: context,
-                  applicationName: 'Kind Karma',
-                  applicationVersion: '1.0.0',
-                  applicationIcon: const Icon(Icons.favorite),
-                  applicationLegalese: '© 2021 Kind Karma',
-                );
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const TermsAndConditions()));
               },
             ),
             ListTile(
               title: const Text('About'),
               trailing: const Icon(Icons.arrow_forward_ios),
               onTap: () {
-                showAboutDialog(
-                  context: context,
-                  applicationName: 'Kind Karma',
-                  applicationVersion: '1.0.0',
-                  applicationIcon: const Icon(Icons.favorite),
-                  applicationLegalese: '© 2021 Kind Karma',
-                );
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const AboutPage()));
               },
             ),
             const Align(
