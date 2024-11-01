@@ -18,7 +18,7 @@ class _SignUpState extends State<SignUp> {
     String email = '';
     String password = '';
     String confirmPassword = '';
-    void _signupProcess(String username, String email, String password,
+    void signupProcess(String username, String email, String password,
         String confirmPassword) async {
       if (username.isNotEmpty &&
           email.isNotEmpty &&
@@ -185,7 +185,7 @@ class _SignUpState extends State<SignUp> {
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
-                    _signupProcess(
+                    signupProcess(
                         username, email, password, confirmPassword);
                   },
                   style: ElevatedButton.styleFrom(

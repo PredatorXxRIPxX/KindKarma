@@ -21,16 +21,14 @@ class _LoginState extends State<Login> {
     } else {
       try {
         await account.createEmailPasswordSession(email: email, password: password);
-        if (await account.get() != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Logged in successfully')),
-          );
-          Future.delayed(const Duration(milliseconds: 2000), () {
-            Navigator.pushReplacementNamed(context, '/home');
-          });
-          return;
-        }
-      } catch (error) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Logged in successfully')),
+        );
+        Future.delayed(const Duration(milliseconds: 2000), () {
+          Navigator.pushReplacementNamed(context, '/home');
+        });
+        return;
+            } catch (error) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('An error has occurred')),
         );

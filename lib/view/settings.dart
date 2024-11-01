@@ -24,7 +24,7 @@ class _SettingsState extends State<Settings> {
         backgroundColor: Colors.black87,
         title: const Text('Settings', style: TextStyle(color: Colors.white)),
       ),
-      body: Container(
+      body: SizedBox(
         width: double.infinity,
         height: double.infinity,
         child: Column(
@@ -60,7 +60,7 @@ class _SettingsState extends State<Settings> {
             const Align(
               alignment: Alignment.bottomCenter,
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: EdgeInsets.all(16.0),
                 child: Text(
                   'Made with ❤️ by Charitex Team from IoWaveStudios',
                   style: TextStyle(
