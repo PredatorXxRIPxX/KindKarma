@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kindkarma/api/api.dart';
 import 'package:lottie/lottie.dart';
 
 class Login extends StatefulWidget {
@@ -10,14 +11,38 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   bool isVisible = false;
-  void login() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Logged in successfully')),
-    );
+
+  void login(String email, String password) async {
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill all fields')),
+      );
+      return;
+    } else {
+      try {
+        await account.createEmailPasswordSession(email: email, password: password);
+        if (await account.get() != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Logged in successfully')),
+          );
+          Future.delayed(const Duration(milliseconds: 2000), () {
+            Navigator.pushReplacementNamed(context, '/home');
+          });
+          return;
+        }
+      } catch (error) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('An error has occurred')),
+        );
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    String email = '';
+    String password = '';
+
     return Scaffold(
       body: SafeArea(
         child: Stack(
@@ -48,10 +73,11 @@ class _LoginState extends State<Login> {
                 Container(
                   margin: const EdgeInsets.symmetric(horizontal: 20),
                   child: TextFormField(
+                    onChanged: (value) => email = value,
                     style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
-                      filled: true, // Enable fill color
-                      fillColor: Colors.black38, // Set background color
+                      filled: true,
+                      fillColor: Colors.black38,
                       prefixIcon: const Icon(Icons.email, color: Colors.white),
                       hintText: 'Email',
                       hintStyle: const TextStyle(color: Colors.white),
@@ -70,11 +96,12 @@ class _LoginState extends State<Login> {
                 Container(
                   margin: const EdgeInsets.symmetric(horizontal: 20),
                   child: TextFormField(
+                    onChanged: (value) => password = value,
                     style: const TextStyle(color: Colors.white),
                     obscureText: !isVisible,
                     decoration: InputDecoration(
-                      filled: true, // Enable fill color
-                      fillColor: Colors.black38, // Set background color
+                      filled: true,
+                      fillColor: Colors.black38,
                       prefixIcon: const Icon(Icons.lock, color: Colors.white),
                       suffixIcon: IconButton(
                         onPressed: () {
@@ -121,10 +148,7 @@ class _LoginState extends State<Login> {
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
-                    login();
-                    Future.delayed(const Duration(milliseconds: 2000), () {
-                      Navigator.pushReplacementNamed(context, '/home');
-                    });
+                    login(email, password);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.black26,

@@ -1,4 +1,7 @@
+import 'package:appwrite/appwrite.dart';
+import 'package:appwrite/models.dart';
 import 'package:flutter/material.dart';
+import 'package:kindkarma/api/api.dart';
 import 'package:lottie/lottie.dart';
 
 class SignUp extends StatefulWidget {
@@ -11,6 +14,54 @@ class SignUp extends StatefulWidget {
 class _SignUpState extends State<SignUp> {
   @override
   Widget build(BuildContext context) {
+    String username = '';
+    String email = '';
+    String password = '';
+    String confirmPassword = '';
+    void _signupProcess(String username, String email, String password,
+        String confirmPassword) async {
+      if (username.isNotEmpty &&
+          email.isNotEmpty &&
+          password.isNotEmpty &&
+          confirmPassword.isNotEmpty) {
+        DocumentList documentList = await database.listDocuments(
+            databaseId: databaseid,
+            collectionId: userCollectionid,
+            queries: [Query.equal('email', email)]);
+        if (documentList.documents.isNotEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Email already exists')),
+          );
+        } else {
+          if (password == confirmPassword) {
+            String id = ID.unique();
+            await account.create(userId: id, email: email, password: password);
+            await database.createDocument(
+                databaseId: databaseid,
+                collectionId: userCollectionid,
+                documentId: ID.unique(),
+                data: {
+                  'iduser': id,
+                  'username': username,
+                  'email': email,
+                  'password': password,
+                });
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Account created successfully')),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Passwords do not match')),
+            );
+          }
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please fill all fields')),
+        );
+      }
+    }
+
     return Scaffold(
       body: SafeArea(
         child: Stack(
@@ -41,6 +92,7 @@ class _SignUpState extends State<SignUp> {
                 Container(
                   margin: const EdgeInsets.symmetric(horizontal: 20),
                   child: TextFormField(
+                    onChanged: (value) => username = value,
                     style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
                       filled: true,
@@ -63,6 +115,7 @@ class _SignUpState extends State<SignUp> {
                 Container(
                   margin: const EdgeInsets.symmetric(horizontal: 20),
                   child: TextFormField(
+                    onChanged: (value) => email = value,
                     style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
                       filled: true,
@@ -85,6 +138,7 @@ class _SignUpState extends State<SignUp> {
                 Container(
                   margin: const EdgeInsets.symmetric(horizontal: 20),
                   child: TextFormField(
+                    onChanged: (value) => password = value,
                     style: const TextStyle(color: Colors.white),
                     obscureText: true,
                     decoration: InputDecoration(
@@ -108,6 +162,7 @@ class _SignUpState extends State<SignUp> {
                 Container(
                   margin: const EdgeInsets.symmetric(horizontal: 20),
                   child: TextFormField(
+                    onChanged: (value) => confirmPassword = value,
                     style: const TextStyle(color: Colors.white),
                     obscureText: true,
                     decoration: InputDecoration(
@@ -130,7 +185,8 @@ class _SignUpState extends State<SignUp> {
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.pushReplacementNamed(context, '/login'); 
+                    _signupProcess(
+                        username, email, password, confirmPassword);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.black26,
@@ -157,7 +213,7 @@ class _SignUpState extends State<SignUp> {
                     ),
                     TextButton(
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, '/login'); 
+                        Navigator.pushReplacementNamed(context, '/login');
                       },
                       child: const Text(
                         'Login',
