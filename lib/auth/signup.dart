@@ -20,10 +20,12 @@ class _SignUpState extends State<SignUp> {
     String confirmPassword = '';
     void signupProcess(String username, String email, String password,
         String confirmPassword) async {
+          debugPrint('Signup process started');
       if (username.isNotEmpty &&
           email.isNotEmpty &&
           password.isNotEmpty &&
           confirmPassword.isNotEmpty) {
+            debugPrint('All fields are filled');
         DocumentList documentList = await database.listDocuments(
             databaseId: databaseid,
             collectionId: userCollectionid,
@@ -185,6 +187,7 @@ class _SignUpState extends State<SignUp> {
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
+                    debugPrint('Signup button clicked');
                     signupProcess(
                         username, email, password, confirmPassword);
                   },

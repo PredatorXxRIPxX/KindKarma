@@ -26,12 +26,15 @@ class _ProfileState extends State<Profile> {
                 height: 200,
                 padding: const EdgeInsets.all(10),
                 decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                        colors: [accentColor, surfaceColor],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight)),
-                child: const Column(
-                  children: [
+                  gradient: LinearGradient(
+                    colors: [accentColor, surfaceColor],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
                     CircleAvatar(
                       radius: 50,
                       child: Icon(
@@ -40,135 +43,98 @@ class _ProfileState extends State<Profile> {
                         color: Colors.white,
                       ),
                     ),
-                    SizedBox(
-                      height: 10,
-                    ),
+                    SizedBox(height: 10),
                     Text(
                       'John Doe',
                       style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold),
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                    SizedBox(
-                      height: 5,
-                    ),
+                    SizedBox(height: 5),
                     Text(
                       'Kind Karma User',
                       style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w400),
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w400,
+                      ),
                     ),
                   ],
                 ),
               ),
             ),
           ),
-          const Row(
-            children: [
-              SizedBox(
-                width: 20,
-              ),
-              Text(
-                'My Profile :',
-                textAlign: TextAlign.left,
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20.0),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'My Profile:',
                 style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 35,
-                    fontWeight: FontWeight.bold),
+                  color: Colors.white,
+                  fontSize: 35,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ],
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          const ListTile(
-            leading: Icon(
-              Icons.email,
-              color: Colors.white,
-            ),
-            title: Text(
-              'Email',
-              style: TextStyle(color: Colors.white, fontSize: 20),
             ),
           ),
-          const SizedBox(
-            height: 20,
-          ),
-          const ListTile(
-            leading: Icon(
-              Icons.phone,
-              color: Colors.white,
-            ),
-            title: Text(
-              'Phone',
-              style: TextStyle(color: Colors.white, fontSize: 20),
-            ),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          const ListTile(
-            leading: Icon(
-              Icons.location_on,
-              color: Colors.white,
-            ),
-            title: Text(
-              'Location',
-              style: TextStyle(color: Colors.white, fontSize: 20),
-            ),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          ListTile(
-            leading: const Icon(
-              Icons.settings,
-              color: Colors.white,
-            ),
-            title: const Text(
-              'settings',
-              style: TextStyle(color: Colors.white, fontSize: 20),
-            ),
-            onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const Settings()));
-            },
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          ListTile(
-            leading: const Icon(
-              Icons.logout,
-              color: Colors.white,
-            ),
-            title: const Text(
-              'Logout',
-              style: TextStyle(color: Colors.white, fontSize: 20),
-            ),
-            onTap: () {
-              showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
+          const SizedBox(height: 20),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              children: [
+                const ListTile(
+                  leading: Icon(Icons.email, color: Colors.white),
+                  title: Text('Email', style: TextStyle(color: Colors.white, fontSize: 20)),
+                ),
+                const ListTile(
+                  leading: Icon(Icons.phone, color: Colors.white),
+                  title: Text('Phone', style: TextStyle(color: Colors.white, fontSize: 20)),
+                ),
+                const ListTile(
+                  leading: Icon(Icons.location_on, color: Colors.white),
+                  title: Text('Location', style: TextStyle(color: Colors.white, fontSize: 20)),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.settings, color: Colors.white),
+                  title: const Text('Settings', style: TextStyle(color: Colors.white, fontSize: 20)),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const Settings()),
+                    );
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.logout, color: Colors.white),
+                  title: const Text('Logout', style: TextStyle(color: Colors.white, fontSize: 20)),
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
                         title: const Text('Logout'),
                         content: const Text('Are you sure you want to logout?'),
                         actions: [
                           TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: const Text('No')),
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text('No'),
+                          ),
                           TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                                Navigator.pop(context);
-                              },
-                              child: const Text('Yes')),
+                            onPressed: () {
+                              Navigator.pop(context); // Close dialog
+                              Navigator.pop(context); // Close profile page
+                            },
+                            child: const Text('Yes'),
+                          ),
                         ],
-                      ));
-            },
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         ],
       ),

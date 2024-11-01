@@ -217,7 +217,6 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
   }
 }
 
-// Theme colors moved to a separate class for better organization
 class ThemeColors {
   static const Color primaryGreen = Color(0xFF4CAF50);
   static const Color darkBackground = Color(0xFF121212);
@@ -225,5 +224,5 @@ class ThemeColors {
   static const Color accentColor = Color(0xFF2E7D32);
   static const Color cardColor = Color(0xFF252525);
 
-  const ThemeColors._(); // Private constructor to prevent instantiation
+  const ThemeColors._(); 
 }
