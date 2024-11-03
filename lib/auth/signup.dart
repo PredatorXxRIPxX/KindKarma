@@ -39,13 +39,6 @@ class _SignUpState extends State<SignUp> {
 
   Future<void> signupProcess() async {
     if (!_formKey.currentState!.validate()) return;
-
-    print('Username: $username');
-    print('Email: $email');
-    print('Password: $password');
-    print('Confirm Password: $confirmPassword');
-    
-
     setState(() => isLoading = true);
 
     try {

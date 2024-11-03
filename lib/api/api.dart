@@ -1,7 +1,6 @@
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:appwrite/appwrite.dart';
 
-Client client = Client().setEndpoint(dotenv.env['END_POINT']??"").setProject(dotenv.env['PROJECT_ID']??"");
+Client client = Client().setEndpoint('https://cloud.appwrite.io/v1').setProject('670d353b0011112ac560');
 Account account = Account(client);
 Databases database = Databases(client);
 Storage storage = Storage(client);
