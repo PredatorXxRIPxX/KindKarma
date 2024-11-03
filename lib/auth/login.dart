@@ -16,6 +16,14 @@ class _LoginState extends State<Login> {
   
   bool isVisible = false;
   bool isLoading = false;
+  void _deleteSession() async {
+    await account.deleteSessions();
+  }
+  @override
+  void initState() {
+    _deleteSession();
+    super.initState();
+  }
   
   @override
   void dispose() {
@@ -39,6 +47,7 @@ class _LoginState extends State<Login> {
       
       _showSuccessSnackBar('Logged in successfully');
       
+
       Future.delayed(const Duration(milliseconds: 2000), () {
         Navigator.pushReplacementNamed(context, '/home');
       });

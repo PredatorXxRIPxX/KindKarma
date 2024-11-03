@@ -1,10 +1,15 @@
+import 'package:appwrite/appwrite.dart';
+import 'package:appwrite/models.dart';
 import 'package:flutter/material.dart';
 import 'package:animated_notch_bottom_bar/animated_notch_bottom_bar/animated_notch_bottom_bar.dart';
+import 'package:kindkarma/api/api.dart';
+import 'package:kindkarma/controllers/userprovider.dart';
 import 'package:kindkarma/view/profile.dart';
 import 'package:kindkarma/view/addcontent.dart';
 import 'package:kindkarma/view/mainpage.dart';
 import 'package:kindkarma/view/notificationpage.dart';
 import 'package:kindkarma/view/search.dart';
+import 'package:provider/provider.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -18,16 +23,22 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
   static const double _kBottomRadius = 28;
   static const double _kIconSize = 24;
   static const Duration _kAnimationDuration = Duration(milliseconds: 300);
-  
+  var _userprovider;
   late final PageController _pageController;
   late final NotchBottomBarController _bottomBarController;
   
   int _currentPage = 0;
   bool _isPageViewAnimating = false;
+  void _setUser() async {
+    _userprovider.setUsername('UserWassim');
+    debugPrint(_userprovider.username);
 
+  }
   @override
   void initState() {
     super.initState();
+    _userprovider = Provider.of<Userprovider>(context, listen: false);
+    _setUser();
     _pageController = PageController(initialPage: _currentPage);
     _bottomBarController = NotchBottomBarController(index: _currentPage);
   }
@@ -41,7 +52,9 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
 
 
   final List<Widget> _pages = const [
-    Mainpage(),
+    Center(
+      child: Text('Home'),
+    ),
     Search(),
     Addcontent(),
     Notificationpage(),
