@@ -23,21 +23,30 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
   static const double _kBottomRadius = 28;
   static const double _kIconSize = 24;
   static const Duration _kAnimationDuration = Duration(milliseconds: 300);
-  var _userprovider;
   late final PageController _pageController;
   late final NotchBottomBarController _bottomBarController;
   
   int _currentPage = 0;
   bool _isPageViewAnimating = false;
   void _setUser() async {
-    _userprovider.setUsername('UserWassim');
-    debugPrint(_userprovider.username);
-
+    final Userprovider user = Provider.of<Userprovider>(context, listen: false);
+    final session = account.get();
+    session.then((value) {
+      user.setEmail(value.email);
+    });
+    DocumentList documents = await database.listDocuments(databaseId: databaseid, collectionId: userCollectionid,queries: [Query.equal('email', user.email)]);
+    Document userdoc = documents.documents[0];
+    print(userdoc.data['email'].toString());
+    user.setEmail(userdoc.data['email']);
+    user.setUsername(userdoc.data['username']);
+    user.setPassword(userdoc.data['password']);
+    print(user.email);
+    print(user.username);
+    print(user.password);
   }
   @override
   void initState() {
     super.initState();
-    _userprovider = Provider.of<Userprovider>(context, listen: false);
     _setUser();
     _pageController = PageController(initialPage: _currentPage);
     _bottomBarController = NotchBottomBarController(index: _currentPage);
