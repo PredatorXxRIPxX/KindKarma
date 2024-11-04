@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:kindkarma/controllers/userprovider.dart';
 import 'package:kindkarma/utils/utility.dart';
 import 'package:kindkarma/view/settings.dart';
+import 'package:provider/provider.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -10,6 +12,17 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
+  late String email;
+  late String username;
+
+  @override
+  void initState() {
+    super.initState();
+    final Userprovider userprovider = Provider.of<Userprovider>(context, listen: false);
+    email = userprovider.email;
+    username = userprovider.username;
+  }
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -34,8 +47,8 @@ class _ProfileState extends State<Profile> {
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    CircleAvatar(
+                  children: [
+                    const CircleAvatar(
                       radius: 50,
                       child: Icon(
                         Icons.person,
@@ -43,17 +56,17 @@ class _ProfileState extends State<Profile> {
                         color: Colors.white,
                       ),
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     Text(
-                      'John Doe',
-                      style: TextStyle(
+                      username, 
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 5),
-                    Text(
+                    const SizedBox(height: 5),
+                    const Text(
                       'Kind Karma User',
                       style: TextStyle(
                         color: Colors.white,
@@ -85,9 +98,15 @@ class _ProfileState extends State<Profile> {
             child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               children: [
-                const ListTile(
-                  leading: Icon(Icons.email, color: Colors.white),
-                  title: Text('Email', style: TextStyle(color: Colors.white, fontSize: 20)),
+                ListTile(  // Removed const to show email
+                  leading: const Icon(Icons.email, color: Colors.white),
+                  title: const Text('Email', 
+                    style: TextStyle(color: Colors.white, fontSize: 20)
+                  ),
+                  subtitle: Text(
+                    email,
+                    style: const TextStyle(color: Colors.white70, fontSize: 16),
+                  ),
                 ),
                 const ListTile(
                   leading: Icon(Icons.phone, color: Colors.white),

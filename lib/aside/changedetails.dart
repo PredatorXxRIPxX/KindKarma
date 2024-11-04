@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:kindkarma/controllers/userprovider.dart';
 import 'package:kindkarma/utils/utility.dart';
+import 'package:provider/provider.dart';
 
 class DetailsPage extends StatefulWidget {
   const DetailsPage({super.key});
@@ -9,17 +11,24 @@ class DetailsPage extends StatefulWidget {
 }
 
 class _DetailsPageState extends State<DetailsPage> {
+  late String email;
+  late String username;
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   bool _obscurePassword = true;
+  
 
   @override
   void initState() {
+    final Userprovider userprovider = Provider.of<Userprovider>(context, listen: false);
+    email = userprovider.email;
+    username = userprovider.username;
+
     super.initState();
-    _nameController.text = 'John Doe';
-    _emailController.text = 'wassimou@gmail.com';
+    _nameController.text = username;
+    _emailController.text = email;
   }
 
   @override
@@ -111,7 +120,7 @@ class _DetailsPageState extends State<DetailsPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  _nameController.text,
+                  username,
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 24,
@@ -119,7 +128,7 @@ class _DetailsPageState extends State<DetailsPage> {
                   ),
                 ),
                 Text(
-                  _emailController.text,
+                  email,
                   style: const TextStyle(color: Colors.white, fontSize: 18),
                   overflow: TextOverflow.ellipsis,
                 ),

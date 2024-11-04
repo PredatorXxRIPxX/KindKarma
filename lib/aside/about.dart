@@ -34,12 +34,12 @@ class AboutPage extends StatelessWidget {
   }) {
     return Card(
       color: Colors.white,
-      elevation: 2,
+      elevation: 8,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         child: Column(
           children: [
             Icon(
@@ -55,6 +55,7 @@ class AboutPage extends StatelessWidget {
                 fontWeight: FontWeight.bold,
                 color: Colors.black87,
               ),
+              overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 8),
             Text(
@@ -65,6 +66,7 @@ class AboutPage extends StatelessWidget {
                 color: Colors.black54,
                 height: 1.5,
               ),
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
@@ -83,13 +85,14 @@ class AboutPage extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
+      child: Container(
+
+        transform: Matrix4.translationValues(0, -20, 0),
         child: Column(
           children: [
-            CircleAvatar(
+            const CircleAvatar(
               radius: 40,
-              backgroundImage: NetworkImage(imageUrl),
+              child: Icon(Icons.person, size: 40),
             ),
             const SizedBox(height: 12),
             Text(
@@ -101,7 +104,6 @@ class AboutPage extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 4),
             Text(
               role,
               style: const TextStyle(
@@ -109,6 +111,7 @@ class AboutPage extends StatelessWidget {
                 color: Colors.black54,
               ),
             ),
+            
           ],
         ),
       ),
@@ -145,6 +148,7 @@ class AboutPage extends StatelessWidget {
           ),
         ),
       ),
+      backgroundColor: Colors.white,
       body: Container(
         color: Colors.white,
         child: SingleChildScrollView(
@@ -255,12 +259,12 @@ class AboutPage extends StatelessWidget {
                     const ListTile(
                       leading: Icon(Icons.email, color: accentColor),
                       title: Text('Email'),
-                      subtitle: Text('contact@example.com'),
+                      subtitle: Text('wassimou009@gmail.com'),
                     ),
                     const ListTile(
                       leading: Icon(Icons.phone, color: accentColor),
                       title: Text('Phone'),
-                      subtitle: Text('+1 (555) 123-4567'),
+                      subtitle: Text('+33 783336571'),
                     ),
                     const ListTile(
                       leading: Icon(Icons.location_on, color: accentColor),

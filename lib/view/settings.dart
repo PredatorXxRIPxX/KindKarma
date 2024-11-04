@@ -24,6 +24,7 @@ class _SettingsState extends State<Settings> {
         backgroundColor: Colors.black87,
         title: const Text('Settings', style: TextStyle(color: Colors.white)),
       ),
+      backgroundColor: Colors.white,
       body: SizedBox(
         width: double.infinity,
         height: double.infinity,
@@ -57,6 +58,9 @@ class _SettingsState extends State<Settings> {
                 Navigator.push(context, MaterialPageRoute(builder: (context) => const AboutPage()));
               },
             ),
+            const Expanded(
+              child:  SizedBox() 
+            ),
             const Align(
               alignment: Alignment.bottomCenter,
               child: Padding(
@@ -67,6 +71,7 @@ class _SettingsState extends State<Settings> {
                       color: Colors.grey,
                       fontSize: 15,
                       fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
                 ),
               ),
             ),

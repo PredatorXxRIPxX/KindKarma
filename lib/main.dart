@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kindkarma/auth/forgot.dart';
 import 'package:kindkarma/auth/login.dart';
 import 'package:kindkarma/auth/signup.dart';
+import 'package:kindkarma/utils/utility.dart';
 import 'package:kindkarma/view/home.dart';
 import 'package:provider/provider.dart';
 import 'package:kindkarma/controllers/userprovider.dart';
@@ -24,7 +25,8 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Kindkarma',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.green,
+        
       ),
       initialRoute: '/login',
       routes: {

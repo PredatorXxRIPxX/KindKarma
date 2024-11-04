@@ -1,6 +1,10 @@
+import 'package:appwrite/appwrite.dart';
+import 'package:appwrite/models.dart';
 import 'package:flutter/material.dart';
 import 'package:kindkarma/api/api.dart';
+import 'package:kindkarma/controllers/userprovider.dart';
 import 'package:lottie/lottie.dart';
+import 'package:provider/provider.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -13,18 +17,20 @@ class _LoginState extends State<Login> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  
+
   bool isVisible = false;
   bool isLoading = false;
+
   void _deleteSession() async {
     await account.deleteSessions();
   }
+
   @override
   void initState() {
     _deleteSession();
     super.initState();
   }
-  
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -42,11 +48,27 @@ class _LoginState extends State<Login> {
         email: _emailController.text.trim(),
         password: _passwordController.text,
       );
-      
+
+      final Userprovider userprovider =
+          Provider.of<Userprovider>(context, listen: false);
+      final session = account.get();
+      session.then((value) {
+        userprovider.setEmail(value.email);
+      });
+
+      DocumentList documents = await database.listDocuments(
+          databaseId: databaseid,
+          collectionId: userCollectionid,
+          queries: [Query.equal('email', _emailController.text.trim())]);
+      Map<String, dynamic> user = documents.documents.first.data;
+
+      userprovider.setEmail(user['email']);
+      userprovider.setUsername(user['username']);
+      userprovider.setUserid(user['\$id']);
+
       if (!mounted) return;
-      
+
       _showSuccessSnackBar('Logged in successfully');
-      
 
       Future.delayed(const Duration(milliseconds: 2000), () {
         Navigator.pushReplacementNamed(context, '/home');
@@ -182,9 +204,12 @@ class _LoginState extends State<Login> {
                           hint: 'Password',
                           icon: Icons.lock,
                           suffixIcon: IconButton(
-                            onPressed: () => setState(() => isVisible = !isVisible),
+                            onPressed: () =>
+                                setState(() => isVisible = !isVisible),
                             icon: Icon(
-                              isVisible ? Icons.visibility : Icons.visibility_off,
+                              isVisible
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
                               color: Colors.white,
                             ),
                           ),
@@ -247,7 +272,8 @@ class _LoginState extends State<Login> {
                           ),
                           TextButton(
                             onPressed: () {
-                              Navigator.pushReplacementNamed(context, '/signup');
+                              Navigator.pushReplacementNamed(
+                                  context, '/signup');
                             },
                             child: const Text(
                               'Register',

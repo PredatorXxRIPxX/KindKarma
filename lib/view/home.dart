@@ -1,15 +1,9 @@
-import 'package:appwrite/appwrite.dart';
-import 'package:appwrite/models.dart';
 import 'package:flutter/material.dart';
 import 'package:animated_notch_bottom_bar/animated_notch_bottom_bar/animated_notch_bottom_bar.dart';
-import 'package:kindkarma/api/api.dart';
-import 'package:kindkarma/controllers/userprovider.dart';
 import 'package:kindkarma/view/profile.dart';
 import 'package:kindkarma/view/addcontent.dart';
-import 'package:kindkarma/view/mainpage.dart';
 import 'package:kindkarma/view/notificationpage.dart';
 import 'package:kindkarma/view/search.dart';
-import 'package:provider/provider.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -28,26 +22,10 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
   
   int _currentPage = 0;
   bool _isPageViewAnimating = false;
-  void _setUser() async {
-    final Userprovider user = Provider.of<Userprovider>(context, listen: false);
-    final session = account.get();
-    session.then((value) {
-      user.setEmail(value.email);
-    });
-    DocumentList documents = await database.listDocuments(databaseId: databaseid, collectionId: userCollectionid,queries: [Query.equal('email', user.email)]);
-    Document userdoc = documents.documents[0];
-    print(userdoc.data['email'].toString());
-    user.setEmail(userdoc.data['email']);
-    user.setUsername(userdoc.data['username']);
-    user.setPassword(userdoc.data['password']);
-    print(user.email);
-    print(user.username);
-    print(user.password);
-  }
+
   @override
   void initState() {
     super.initState();
-    _setUser();
     _pageController = PageController(initialPage: _currentPage);
     _bottomBarController = NotchBottomBarController(index: _currentPage);
   }

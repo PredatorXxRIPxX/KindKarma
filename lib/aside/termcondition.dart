@@ -79,6 +79,7 @@ class TermsAndConditions extends StatelessWidget {
           ),
         ),
       ),
+      backgroundColor: Colors.white,
       body: Container(
         color: Colors.white,
         child: SingleChildScrollView(
