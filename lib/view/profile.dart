@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kindkarma/api/api.dart';
 import 'package:kindkarma/controllers/userprovider.dart';
 import 'package:kindkarma/utils/utility.dart';
 import 'package:kindkarma/view/settings.dart';
@@ -14,6 +15,25 @@ class Profile extends StatefulWidget {
 class _ProfileState extends State<Profile> {
   late String email;
   late String username;
+
+  Future <void> logout(BuildContext context) async {
+    try {
+      await account.deleteSession(sessionId: "current");
+    } catch (e) {
+      AlertDialog(
+        title: const Text('Error'),
+        content: Text(e.toString()),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+        ],
+      );
+    } finally {
+      Navigator.pushReplacementNamed(context, '/login');
+    }
+  }
 
   @override
   void initState() {
@@ -138,14 +158,13 @@ class _ProfileState extends State<Profile> {
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(context),
-                            child: const Text('No'),
+                            child: const Text('No',style: TextStyle(color: primaryGreen),),
                           ),
                           TextButton(
                             onPressed: () {
-                              Navigator.pop(context); // Close dialog
-                              Navigator.pop(context); // Close profile page
+                              logout(context);
                             },
-                            child: const Text('Yes'),
+                            child: const Text('Yes',style: TextStyle(color: primaryGreen),),
                           ),
                         ],
                       ),
