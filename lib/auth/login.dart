@@ -3,6 +3,7 @@ import 'package:appwrite/models.dart';
 import 'package:flutter/material.dart';
 import 'package:kindkarma/api/api.dart';
 import 'package:kindkarma/controllers/userprovider.dart';
+import 'package:kindkarma/utils/notificationBuilder.dart';
 import 'package:kindkarma/utils/utility.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
@@ -30,70 +31,52 @@ class _LoginState extends State<Login> {
   }
 
   Future<void> login() async {
-    if (!_formKey.currentState!.validate()) return;
+  if (!_formKey.currentState!.validate()) return;
 
-    setState(() => isLoading = true);
+  setState(() => isLoading = true);
+
+  try {
+    final Userprovider userprovider =
+        Provider.of<Userprovider>(context, listen: false);
 
     try {
-      await account.createEmailPasswordSession(
-        email: _emailController.text.trim(),
-        password: _passwordController.text,
-      );
+      await account.deleteSessions();
+    } catch (e) {
+      showErrorSnackBar('An unexpected error occurred',context);
+    }
 
-      final Userprovider userprovider =
-          Provider.of<Userprovider>(context, listen: false);
-      final session = account.get();
-      session.then((value) {
-        userprovider.setEmail(value.email);
-      });
+    await account.createEmailPasswordSession(
+      email: _emailController.text.trim(),
+      password: _passwordController.text,
+    );
 
-      DocumentList documents = await database.listDocuments(
-          databaseId: databaseid,
-          collectionId: userCollectionid,
-          queries: [Query.equal('email', _emailController.text.trim())]);
-      Map<String, dynamic> user = documents.documents.first.data;
+    
+    final user = await account.get();
+    
+    userprovider.setEmail(user.email);
+    userprovider.setUserid(user.$id);
+    userprovider.setUsername(user.name);
 
-      userprovider.setEmail(user['email']);
-      userprovider.setUsername(user['username']);
-      userprovider.setUserid(user['\$id']);
-
-      if (!mounted) return;
-
-      _showSuccessSnackBar('Logged in successfully');
-
-      Future.delayed(const Duration(milliseconds: 2000), () {
-        Navigator.pushReplacementNamed(context, '/home');
-      });
-    } catch (error) {
-      _showErrorSnackBar('Invalid email or password');
-    } finally {
-      if (mounted) {
-        setState(() => isLoading = false);
-      }
+    if (mounted) {
+      showSuccessSnackBar('Login successful!', context);
+      Navigator.pushReplacementNamed(context, '/home');
+    }
+  } on AppwriteException catch (e) {
+    if (mounted) {
+      showErrorSnackBar(e.message ?? 'Login failed', context);
+    }
+  } catch (e) {
+    if (mounted) {
+      showErrorSnackBar('An unexpected error occurred',context);
+    }
+  } finally {
+    if (mounted) {
+      setState(() => isLoading = false);
     }
   }
+}
 
-  void _showErrorSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-        behavior: SnackBarBehavior.floating,
-        elevation: 7.0,
-      ),
-    );
-  }
-
-  void _showSuccessSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.green,
-        behavior: SnackBarBehavior.floating,
-        elevation: 7.0,
-      ),
-    );
-  }
+  
 
   InputDecoration _inputDecoration({
     required String hint,

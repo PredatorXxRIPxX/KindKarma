@@ -58,7 +58,16 @@ class _NotificationpageState extends State<Notificationpage> {
         }
 
         if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const Center(child: Text('No notifications available', style: TextStyle(fontSize: 20.0,color: accentColor)));
+          return const Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(Icons.notifications_off, size: 100.0, color: accentColor),
+              SizedBox(height: 10.0),
+              Text('No notifications available', style: TextStyle(fontSize: 20.0,color: accentColor)),
+            ],
+          ));
         }
 
         return ListView.builder(

@@ -2,6 +2,7 @@ import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
 import 'package:flutter/material.dart';
 import 'package:kindkarma/api/api.dart';
+import 'package:kindkarma/utils/notificationBuilder.dart';
 import 'package:kindkarma/utils/utility.dart';
 import 'package:lottie/lottie.dart';
 
@@ -51,7 +52,7 @@ class _SignUpState extends State<SignUp> {
       );
 
       if (documentList.documents.isNotEmpty) {
-        _showErrorSnackBar('Email already exists');
+        showErrorSnackBar('Email already exists',context);
         return;
       }
 
@@ -74,37 +75,17 @@ class _SignUpState extends State<SignUp> {
         },
       );
 
-      _showSuccessSnackBar('Account created successfully');
+      showSuccessSnackBar('Account created successfully',context);
       
       Future.delayed(const Duration(seconds: 2), () {
         Navigator.pushReplacementNamed(context, '/login');
       });
 
     } catch (e) {
-      _showErrorSnackBar('Error creating account. Please try again.');
+      showErrorSnackBar('Error creating account. Please try again.',context);
     } finally {
       setState(() => isLoading = false);
     }
-  }
-
-  void _showErrorSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        elevation: 7.0,
-        backgroundColor: Colors.red,
-        content: Text(message),
-      ),
-    );
-  }
-
-  void _showSuccessSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        elevation: 7.0,
-        backgroundColor: Colors.green,
-        content: Text(message),
-      ),
-    );
   }
 
   @override
