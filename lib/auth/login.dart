@@ -3,6 +3,7 @@ import 'package:appwrite/models.dart';
 import 'package:flutter/material.dart';
 import 'package:kindkarma/api/api.dart';
 import 'package:kindkarma/controllers/userprovider.dart';
+import 'package:kindkarma/utils/utility.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 
@@ -20,16 +21,6 @@ class _LoginState extends State<Login> {
 
   bool isVisible = false;
   bool isLoading = false;
-
-  void _deleteSession() async {
-    await account.deleteSessions();
-  }
-
-  @override
-  void initState() {
-    _deleteSession();
-    super.initState();
-  }
 
   @override
   void dispose() {
@@ -172,6 +163,7 @@ class _LoginState extends State<Login> {
                       ),
                       const SizedBox(height: 30),
                       TextFormField(
+                        cursorColor: primaryGreen,
                         controller: _emailController,
                         style: const TextStyle(color: Colors.white),
                         validator: (value) {
@@ -191,6 +183,7 @@ class _LoginState extends State<Login> {
                       ),
                       const SizedBox(height: 20),
                       TextFormField(
+                        cursorColor: primaryGreen,
                         controller: _passwordController,
                         style: const TextStyle(color: Colors.white),
                         obscureText: !isVisible,
