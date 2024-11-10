@@ -104,18 +104,13 @@ class _AddContentState extends State<AddContent> {
     }
     try {
       final fileId = ID.unique();
+      final idPost = ID.unique();
+
       await storage.createFile(
           bucketId: storageid,
           fileId: fileId,
           file: InputFile.fromPath(path: image!.path));
-      final idPost = ID.unique();
 
-      final userid = account.get().then((value){
-        return value.$id;
-      });
-      
-      print('from provider ${userprovider.userid}');
-      // error is here 
       await database.createDocument(
           databaseId: databaseid,
           collectionId: postCollectionid,
