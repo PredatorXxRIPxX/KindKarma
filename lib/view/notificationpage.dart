@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:kindkarma/api/api.dart';
 import 'package:kindkarma/components/notificationCard.dart';
 import 'package:kindkarma/controllers/userprovider.dart';
+import 'package:kindkarma/utils/notificationBuilder.dart';
 import 'package:kindkarma/utils/utility.dart';
 import 'package:provider/provider.dart';
 
@@ -31,7 +32,7 @@ class _NotificationpageState extends State<Notificationpage> {
       );
       return documents.documents;
     } catch (e) {
-      print('Error fetching notifications: $e');
+      showErrorSnackBar('Verify you network connection', context);
       return [];
     }
   }
@@ -50,7 +51,7 @@ class _NotificationpageState extends State<Notificationpage> {
       future: getNotifications(),
       builder: (context, AsyncSnapshot<List<Document>> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator(color: primaryGreen,));
         }
         
         if (snapshot.hasError) {
