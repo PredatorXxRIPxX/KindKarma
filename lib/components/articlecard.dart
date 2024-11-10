@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:kindkarma/api/api.dart';
+import 'package:kindkarma/aside/carddetailed.dart';
 import 'package:kindkarma/utils/utility.dart';
 
 class ArticleCard extends StatelessWidget {
@@ -57,7 +58,18 @@ class ArticleCard extends StatelessWidget {
       ),
       child: InkWell(
         onTap: (){
-          print('Card tapped');
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Carddetailed(
+                title: title,
+                description: description,
+                image: getImageViewLink(image),
+                author: author,
+                date: date,
+              ),
+            ),
+          );
         },
         child: Column(
           children: [
