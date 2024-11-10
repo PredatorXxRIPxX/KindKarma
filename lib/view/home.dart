@@ -43,7 +43,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
       child: Text('Home'),
     ),
     Search(),
-    Addcontent(),
+    AddContent(),
     Notificationpage(),
     Profile(),
   ];

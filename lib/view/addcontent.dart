@@ -1,17 +1,26 @@
+import 'dart:io';
+import 'package:appwrite/appwrite.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:kindkarma/api/api.dart';
+import 'package:kindkarma/controllers/userprovider.dart';
 import 'package:kindkarma/utils/notificationBuilder.dart';
 import 'package:kindkarma/utils/utility.dart';
+import 'package:provider/provider.dart';
 
-class Addcontent extends StatefulWidget {
-  const Addcontent({super.key});
+class AddContent extends StatefulWidget {
+  const AddContent({super.key});
 
   @override
-  State<Addcontent> createState() => _AddcontentState();
+  State<AddContent> createState() => _AddContentState();
 }
 
-class _AddcontentState extends State<Addcontent> {
+class _AddContentState extends State<AddContent> {
   String title = '';
   String description = '';
+  XFile? image;
+  late Userprovider userprovider;
+  bool isuploading = false;
 
   Future<Widget?> selectSource(BuildContext context) {
     return showModalBottomSheet<Widget>(
@@ -53,7 +62,7 @@ class _AddcontentState extends State<Addcontent> {
                       label: 'Camera',
                       onTap: () {
                         Navigator.pop(context);
-                        addcontent(context);
+                        addContent(context, 'camera');
                       },
                     ),
                     _buildOptionButton(
@@ -62,7 +71,7 @@ class _AddcontentState extends State<Addcontent> {
                       label: 'Gallery',
                       onTap: () {
                         Navigator.pop(context);
-                        addcontent(context);
+                        addContent(context, 'gallery');
                       },
                     ),
                   ],
@@ -73,6 +82,59 @@ class _AddcontentState extends State<Addcontent> {
         );
       },
     );
+  }
+
+  Future<void> _uploadcontent(BuildContext context) async {
+    if (title.isEmpty || description.isEmpty || image == null) {
+      showInfoSnackBar('you need to fill all the information', context);
+      return;
+    }
+    isuploading = true;
+    if (isuploading) {
+      showDialog(
+          context: context,
+          builder: (context) {
+            return const Center(
+              child: CircularProgressIndicator(
+                color: primaryGreen,
+              ),
+            );
+          });
+    }
+    try {
+      final fileId = ID.unique();
+      await storage.createFile(
+          bucketId: storageid,
+          fileId: fileId,
+          file: InputFile.fromPath(path: image!.path));
+      final idPost = ID.unique();
+      final userid = account.get().then((value){
+        return value.$id;
+      });
+      
+      print('from provider ${userprovider.userid}');
+      // error is here 
+      await database.createDocument(
+          databaseId: databaseid,
+          collectionId: postCollectionid,
+          documentId: idPost,
+          data: {
+            'title': title,
+            'description': description,
+            'postimage': fileId,
+            'user': userid,
+            'created_at': DateTime.now().toString(),
+          });
+
+      showSuccessSnackBar('Content added successfully', context);
+    } catch (e) {
+      showErrorSnackBar('Check your network connection', context);
+    } finally {
+      setState(() {
+        isuploading = false;
+      });
+      Navigator.pop(context);
+    }
   }
 
   Widget _buildOptionButton({
@@ -112,10 +174,27 @@ class _AddcontentState extends State<Addcontent> {
     );
   }
 
-  Future<void> addcontent(BuildContext context) async {
-    try {} catch (e) {
-      showErrorSnackBar('Verify your network connection', context);
+  Future<void> addContent(BuildContext context, String source) async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? pickedFile;
+
+    if (source == 'camera') {
+      pickedFile =
+          await picker.pickImage(source: ImageSource.camera, imageQuality: 80);
+    } else {
+      pickedFile =
+          await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
     }
+
+    setState(() {
+      image = pickedFile;
+    });
+  }
+
+  @override
+  void initState() {
+    userprovider = Provider.of<Userprovider>(context, listen: false);
+    super.initState();
   }
 
   @override
@@ -151,25 +230,33 @@ class _AddcontentState extends State<Addcontent> {
                 onTap: () {
                   selectSource(context);
                 },
-                child: const Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.add,
-                      color: primaryGreen,
-                      size: 50,
-                    ),
-                    SizedBox(height: 10),
-                    Text(
-                      'Add Image',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
+                child: image != null
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.file(
+                          File(image!.path),
+                          fit: BoxFit.cover,
+                        ),
+                      )
+                    : const Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.add,
+                            color: primaryGreen,
+                            size: 50,
+                          ),
+                          SizedBox(height: 10),
+                          Text(
+                            'Add Image',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
               ),
             ),
           ),
@@ -227,7 +314,7 @@ class _AddcontentState extends State<Addcontent> {
             alignment: Alignment.center,
             child: ElevatedButton(
               onPressed: () {
-                debugPrint('Add Content');
+                _uploadcontent(context);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: primaryGreen,
