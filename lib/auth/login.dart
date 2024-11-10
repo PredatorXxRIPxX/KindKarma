@@ -52,11 +52,17 @@ class _LoginState extends State<Login> {
 
     
     final user = await account.get();
-    
-    userprovider.setEmail(user.email);
-    userprovider.setUserid(user.$id);
-    userprovider.setUsername(user.name);
 
+    DocumentList documentList = await database.listDocuments(databaseId: databaseid, collectionId: userCollectionid,queries: [
+      Query.select(['iduser']),
+      Query.equal('email',user.email),
+    ]);
+
+    userprovider.setUserid(documentList.documents[0].data['iduser']);
+    userprovider.setEmail(user.email);
+    userprovider.setUsername(user.name);
+    
+    print(userprovider.userid);
     if (mounted) {
       showSuccessSnackBar('Login successful!', context);
       Navigator.pushReplacementNamed(context, '/home');

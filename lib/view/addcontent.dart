@@ -50,6 +50,7 @@ class _AddContentState extends State<AddContent> {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
               ),
               Expanded(
@@ -108,6 +109,7 @@ class _AddContentState extends State<AddContent> {
           fileId: fileId,
           file: InputFile.fromPath(path: image!.path));
       final idPost = ID.unique();
+
       final userid = account.get().then((value){
         return value.$id;
       });
@@ -122,13 +124,13 @@ class _AddContentState extends State<AddContent> {
             'title': title,
             'description': description,
             'postimage': fileId,
-            'user': userid,
+            'idpost': idPost,
+            'user': userprovider.userid,
             'created_at': DateTime.now().toString(),
           });
-
       showSuccessSnackBar('Content added successfully', context);
     } catch (e) {
-      showErrorSnackBar('Check your network connection', context);
+      showErrorSnackBar('check your network connection', context);
     } finally {
       setState(() {
         isuploading = false;
