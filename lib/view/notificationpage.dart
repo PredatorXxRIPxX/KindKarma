@@ -24,7 +24,7 @@ class _NotificationpageState extends State<Notificationpage> {
         databaseId: databaseid,
         collectionId: notificationCollection,
         queries: [
-          Query.select(['text', 'date']),
+          Query.select(['notificationid','text', 'date']),
           Query.equal('userid', userid),
           Query.orderDesc('date'), 
         ],
@@ -75,9 +75,9 @@ class _NotificationpageState extends State<Notificationpage> {
           itemBuilder: (context, index) {
             final notification = snapshot.data![index];
             return NotificationCard(
+              notificationid: notification.data['notificationid']??'hello',
               titleEvent: notification.data['text'],
-
-              time:notification.data['date'],
+              time:DateTime.parse(notification.data['date']),
             );
           },
         );

@@ -150,6 +150,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.2"
+  flutter_swipe_action_cell:
+    dependency: "direct main"
+    description:
+      name: flutter_swipe_action_cell
+      sha256: f09036bf30fea826d9ee7e86f72f040011f42783e8c629a1a549587b0e057c53
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.1.5"
   flutter_test:
     dependency: "direct dev"
     description: flutter
