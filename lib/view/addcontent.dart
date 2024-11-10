@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kindkarma/utils/notificationBuilder.dart';
 import 'package:kindkarma/utils/utility.dart';
 
 class Addcontent extends StatefulWidget {
@@ -9,6 +10,114 @@ class Addcontent extends StatefulWidget {
 }
 
 class _AddcontentState extends State<Addcontent> {
+  String title = '';
+  String description = '';
+
+  Future<Widget?> selectSource(BuildContext context) {
+    return showModalBottomSheet<Widget>(
+      backgroundColor: surfaceColor,
+      elevation: 7.0,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      context: context,
+      builder: (BuildContext context) {
+        return SizedBox(
+          height: MediaQuery.of(context).size.height * 0.25,
+          child: Column(
+            children: [
+              Container(
+                margin: const EdgeInsets.only(top: 8),
+                height: 4,
+                width: 40,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'Select Source',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _buildOptionButton(
+                      context: context,
+                      icon: Icons.camera_alt,
+                      label: 'Camera',
+                      onTap: () {
+                        Navigator.pop(context);
+                        addcontent(context);
+                      },
+                    ),
+                    _buildOptionButton(
+                      context: context,
+                      icon: Icons.image,
+                      label: 'Gallery',
+                      onTap: () {
+                        Navigator.pop(context);
+                        addcontent(context);
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildOptionButton({
+    required BuildContext context,
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(15),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              color: primaryGreen,
+              size: 50,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              style: const TextStyle(
+                color: primaryGreen,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> addcontent(BuildContext context) async {
+    try {} catch (e) {
+      showErrorSnackBar('Verify your network connection', context);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,7 +149,7 @@ class _AddcontentState extends State<Addcontent> {
               ),
               child: InkWell(
                 onTap: () {
-                  debugPrint('Add Image');
+                  selectSource(context);
                 },
                 child: const Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -68,6 +177,11 @@ class _AddcontentState extends State<Addcontent> {
           Padding(
             padding: const EdgeInsets.all(20),
             child: TextFormField(
+              onChanged: (value) {
+                setState(() {
+                  title = value;
+                });
+              },
               style: const TextStyle(color: Colors.white),
               cursorColor: primaryGreen,
               decoration: InputDecoration(
@@ -84,10 +198,14 @@ class _AddcontentState extends State<Addcontent> {
               ),
             ),
           ),
-          
           Padding(
             padding: const EdgeInsets.all(20),
             child: TextFormField(
+              onChanged: (value) {
+                setState(() {
+                  description = value;
+                });
+              },
               style: const TextStyle(color: Colors.white),
               cursorColor: primaryGreen,
               decoration: InputDecoration(
@@ -113,7 +231,8 @@ class _AddcontentState extends State<Addcontent> {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: primaryGreen,
-                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -127,6 +246,9 @@ class _AddcontentState extends State<Addcontent> {
                 ),
               ),
             ),
+          ),
+          const SizedBox(
+            height: 20,
           ),
         ],
       ),
