@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:animated_notch_bottom_bar/animated_notch_bottom_bar/animated_notch_bottom_bar.dart';
+import 'package:kindkarma/view/mainpage.dart';
 import 'package:kindkarma/view/profile.dart';
 import 'package:kindkarma/view/addcontent.dart';
 import 'package:kindkarma/view/notificationpage.dart';
@@ -39,9 +40,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
 
 
   final List<Widget> _pages = const [
-    Center(
-      child: Text('Home'),
-    ),
+    MainPage(),
     Search(),
     AddContent(),
     Notificationpage(),

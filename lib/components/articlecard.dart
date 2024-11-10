@@ -1,96 +1,131 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:kindkarma/api/api.dart';
+import 'package:kindkarma/utils/utility.dart';
 
-// ignore: must_be_immutable
-class Articlecard extends StatefulWidget {
-  String title;
-  String description;
-  String image;
-  String author;
-  DateTime date;
-  String category;
-  Articlecard({super.key, required this.title, required this.description, required this.image, required this.author, required this.date, required this.category});
+class ArticleCard extends StatelessWidget {
+  final String title;
+  final String description;
+  final String image;
+  final String author;
+  final DateTime date;
+  final String category;
 
-  @override
-  State<Articlecard> createState() => _ArticlecardState();
-}
+  ArticleCard({
+    required this.title,
+    required this.description,
+    required this.image,
+    required this.author,
+    required this.date,
+    required this.category,
+  });
 
-class _ArticlecardState extends State<Articlecard> {
+  String _formatTimeAgo() {
+    final now = DateTime.now();
+    final difference = now.difference(date);
+
+    if (difference.inDays > 7) {
+      return DateFormat('MMM d').format(date);
+    } else if (difference.inDays > 0) {
+      return '${difference.inDays}d ago';
+    } else if (difference.inHours > 0) {
+      return '${difference.inHours}h ago';
+    } else if (difference.inMinutes > 0) {
+      return '${difference.inMinutes}m ago';
+    } else {
+      return 'now';
+    }
+  }
+
+    
+
+    String getImageViewLink(String image) {
+      return '$setEndpoint/storage/buckets/$storageid/files/$image/view?project=670d353b0011112ac560&project=$projectid&mode=admin';
+    }
+
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.grey,
-            blurRadius: 5,
-            offset: Offset(0, 3),
-          ),
-        ],
+
+
+
+    return Card(
+      color: surfaceColor,
+      elevation: 5,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
       ),
-      child: Column(
-        children: [
-          ClipRRect(
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(10),
-              topRight: Radius.circular(10),
+      child: InkWell(
+        onTap: (){
+          print('Card tapped');
+        },
+        child: Column(
+          children: [
+            Expanded(
+              child: ClipRRect(
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                child: Image.network(
+                  getImageViewLink(image),
+                  height: 150,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+              ),
             ),
-            clipBehavior: Clip.antiAlias,
-            child: Image.network(widget.image)
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  widget.title,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  widget.description,
-                  style: const TextStyle(
-                    fontSize: 16,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Row(
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.author,
+                      title,
                       style: const TextStyle(
                         fontSize: 16,
-                        color: Colors.grey,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(width: 10),
-                    Text(
-                      widget.date.compareTo(DateTime.now()).toString(),
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey,
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Text(
-                      widget.category,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey,
-                      ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        const CircleAvatar(
+                          radius: 12,
+                          backgroundColor: darkBackground,
+                          child: Icon(
+                            Icons.person,
+                            color: primaryGreen,
+                            size: 16,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          author,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          _formatTimeAgo(),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
+      )
     );
   }
 }
