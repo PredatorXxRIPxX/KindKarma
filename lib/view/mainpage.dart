@@ -3,8 +3,10 @@ import 'package:appwrite/models.dart';
 import 'package:flutter/material.dart';
 import 'package:kindkarma/api/api.dart';
 import 'package:kindkarma/components/articlecard.dart';
+import 'package:kindkarma/controllers/userprovider.dart';
 import 'package:kindkarma/utils/notificationBuilder.dart';
 import 'package:kindkarma/utils/utility.dart';
+import 'package:provider/provider.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -16,6 +18,7 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   final ScrollController _scrollController = ScrollController();
   final List<Document> _documents = []; 
+  late Userprovider userProvider;
   bool _isLoading = false;
   bool _hasMoreData = true;
   static const int _limit = 10;
@@ -23,6 +26,7 @@ class _MainPageState extends State<MainPage> {
   @override
   void initState() {
     super.initState();
+    userProvider = Provider.of<Userprovider>(context, listen: false);
     _loadInitialData();
     _scrollController.addListener(_scrollListener);
   }
@@ -92,6 +96,7 @@ class _MainPageState extends State<MainPage> {
         databaseId: databaseid,
         collectionId: postCollectionid,
         queries: [
+          Query.notEqual('user', userProvider.userid),
           Query.orderDesc('created_at'),
           Query.limit(_limit),
           Query.offset(_documents.length),

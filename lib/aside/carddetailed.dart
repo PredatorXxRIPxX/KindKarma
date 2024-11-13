@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:kindkarma/utils/notificationBuilder.dart';
 import 'package:kindkarma/utils/utility.dart';
 
 class Carddetailed extends StatefulWidget {
@@ -321,7 +322,8 @@ class _CarddetailedState extends State<Carddetailed> {
                             IconButton(
                               icon: Icon(Icons.send,color: message.isEmpty || message == '' ? Colors.grey : primaryGreen ,),
                               onPressed: () {
-                                print(message);
+                                Navigator.pop(context);
+                                showSuccessSnackBar("Message Send Succefully", context);
                               },
                             ),
                           ],

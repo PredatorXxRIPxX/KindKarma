@@ -6,6 +6,7 @@ Databases database = Databases(client);
 Storage storage = Storage(client);
 Teams teams = Teams(client);
 Avatars avatars = Avatars(client);
+Messaging messages = Messaging(client);
 
 String projectid = '670d353b0011112ac560';
 String setEndpoint = 'https://cloud.appwrite.io/v1';
