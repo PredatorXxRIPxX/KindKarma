@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:kindkarma/api/api.dart';
 import 'package:kindkarma/utils/notificationBuilder.dart';
 import 'package:kindkarma/utils/utility.dart';
 
@@ -27,6 +28,18 @@ class _CarddetailedState extends State<Carddetailed> {
   late ScrollController _scrollController;
   bool _showAppBarTitle = false;
   String message = '';
+
+  Future<void> sendMessage(String message, BuildContext context) async {
+    if(message.isEmpty){
+      showInfoSnackBar('Message can not be empty', context);
+      return;
+    }
+    try {
+      showSuccessSnackBar('message send succefully', context);
+    } catch (e) {
+      showErrorSnackBar('An error has been occured while sending message', context);
+    }
+  }
 
   @override
   void initState() {
@@ -323,7 +336,7 @@ class _CarddetailedState extends State<Carddetailed> {
                               icon: Icon(Icons.send,color: message.isEmpty || message == '' ? Colors.grey : primaryGreen ,),
                               onPressed: () {
                                 Navigator.pop(context);
-                                showSuccessSnackBar("Message Send Succefully", context);
+                                sendMessage(message,context);
                               },
                             ),
                           ],
