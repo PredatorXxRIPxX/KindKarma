@@ -61,7 +61,7 @@ class ArticleCard extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => Carddetailed(
+              builder: (context) => CardDetailed(
                 title: title,
                 description: description,
                 image: getImageViewLink(image),
