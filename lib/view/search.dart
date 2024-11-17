@@ -249,8 +249,7 @@ class _SearchState extends State<Search> {
           description:
               _searchResults[index].data['description']?.toString() ?? '',
           image: _searchResults[index].data['postimage']?.toString() ?? '',
-          author:
-              _searchResults[index].data['user']['username']?.toString() ?? '',
+          author: _searchResults[index],
           date: DateTime.tryParse(
                   _searchResults[index].data['created_at']?.toString() ?? '') ??
               DateTime.now(),

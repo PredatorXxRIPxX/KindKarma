@@ -1,3 +1,4 @@
+import 'package:appwrite/models.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:kindkarma/api/api.dart';
@@ -8,7 +9,7 @@ class ArticleCard extends StatelessWidget {
   final String title;
   final String description;
   final String image;
-  final String author;
+  final Document author;
   final DateTime date;
   final String category;
 
@@ -38,18 +39,13 @@ class ArticleCard extends StatelessWidget {
     }
   }
 
-    
-
     String getImageViewLink(String image) {
       return '$setEndpoint/storage/buckets/$storageid/files/$image/view?project=670d353b0011112ac560&project=$projectid&mode=admin';
     }
 
-
+    
   @override
   Widget build(BuildContext context) {
-
-
-
     return Card(
       color: surfaceColor,
       elevation: 5,
@@ -65,7 +61,7 @@ class ArticleCard extends StatelessWidget {
                 title: title,
                 description: description,
                 image: getImageViewLink(image),
-                author: author,
+                author: author.data['user'],
                 date: date,
               ),
             ),
@@ -115,7 +111,7 @@ class ArticleCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          author,
+                          author.data['user']['username']?.toString() ?? 'Unknown',
                           style: const TextStyle(
                             fontSize: 12,
                             color: Colors.grey,

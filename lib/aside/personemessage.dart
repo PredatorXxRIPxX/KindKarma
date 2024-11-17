@@ -10,34 +10,26 @@ import 'package:kindkarma/utils/utility.dart';
 import 'package:provider/provider.dart';
 
 class Personemessage extends StatefulWidget {
-  final String email;
-  const Personemessage({super.key, required this.email});
+  final Document userDocuments;
+  const Personemessage({super.key, required this.userDocuments});
 
   @override
   State<Personemessage> createState() => _PersonemessageState();
 }
 
 class _PersonemessageState extends State<Personemessage> {
-  Document? reciever; // Made nullable
+  Document? reciever; 
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final List<Messagemodel> messages = [];
   late Userprovider userprovider;
-  RealtimeSubscription? _subscription; // Made nullable
+  RealtimeSubscription? _subscription; 
 
   @override
   void initState() {
     super.initState();
     userprovider = Provider.of<Userprovider>(context, listen: false);
-    _initializeChat();
-  }
-
-  Future<void> _initializeChat() async {
-    await _fetchReciever(widget.email);
-    if (reciever != null) {
-      _setupRealtimeSubscription();
-      await _loadInitialMessages();
-    }
+    
   }
 
   void _setupRealtimeSubscription() {
@@ -154,7 +146,6 @@ class _PersonemessageState extends State<Personemessage> {
       if (response.documents.isEmpty) {
         throw Exception('User not found');
       }
-
       setState(() {
         reciever = response.documents.first;
       });
@@ -235,7 +226,7 @@ class _PersonemessageState extends State<Personemessage> {
             backgroundImage: NetworkImage('https://appwrite.io/images/brand-assets/appwrite-logo-dark.png'),
           ),
           title: Text(
-            widget.email,
+            widget.userDocuments.data['username'],
             style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,

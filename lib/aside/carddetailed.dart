@@ -1,4 +1,5 @@
 import 'package:appwrite/appwrite.dart';
+import 'package:appwrite/models.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:kindkarma/api/api.dart';
@@ -12,7 +13,7 @@ class CardDetailed extends StatefulWidget {
   final String title;
   final String description;
   final String image;
-  final String author;
+  final Map<String,dynamic> author;
   final DateTime date;
 
   const CardDetailed({
@@ -37,6 +38,7 @@ class _CardDetailedState extends State<CardDetailed> {
 
   @override
   void initState() {
+    print(widget.author['username'].toString());
     super.initState();
     _userProvider = Provider.of<Userprovider>(context, listen: false);
     _scrollController = ScrollController()
@@ -58,43 +60,8 @@ class _CardDetailedState extends State<CardDetailed> {
     super.dispose();
   }
 
-  Future<void> _sendMessage(BuildContext context) async {
-    if (_message.trim().isEmpty) {
-      showInfoSnackBar('Message cannot be empty', context);
-      return;
-    }
-
-    try {
-      await database.createDocument(
-        databaseId: databaseid,
-        collectionId: chatCollectionid,
-        documentId: ID.unique(),
-        data: {
-          'message': _message.trim(),
-          'sender_id': _userProvider.userid,
-          'receiver_id': widget.author,
-          'isImage': false,
-          'isSeenByReceiver': false,
-          'timestamp': DateTime.now().millisecondsSinceEpoch,
-        },
-      );
-
-      if (!mounted) return;
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => Personemessage(email: widget.author),
-        ),
-      );
-      showSuccessSnackBar('Message sent successfully', context);
-      _messageController.clear();
-      setState(() => _message = '');
-    } catch (e) {
-      showErrorSnackBar(e.toString(), context);
-    }
-  }
-
   String _formatDate(DateTime date) {
+    print(widget.author['username'].toString());
     return DateFormat('MMMM d, yyyy').format(date);
   }
 
@@ -121,7 +88,7 @@ class _CardDetailedState extends State<CardDetailed> {
       radius: 24,
       backgroundColor: primaryGreen,
       child: Text(
-        widget.author.isNotEmpty ? widget.author[0].toUpperCase() : '?',
+        widget.author['username'] || widget.author['username'] != null ? widget.author['username'].toString() : 'Unknown',
         style: const TextStyle(
           color: surfaceColor,
           fontSize: 20,
@@ -132,11 +99,12 @@ class _CardDetailedState extends State<CardDetailed> {
   }
 
   Widget _buildAuthorDetails() {
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          widget.author,
+          widget.author['username'].isNotEmpty || widget.author['username'] != null ? widget.author['username'].toString() : 'Unkonwn',
           style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
@@ -168,7 +136,7 @@ class _CardDetailedState extends State<CardDetailed> {
         IconButton(
           icon: const Icon(Icons.bookmark_border, color: Colors.white),
           onPressed: () {
-            // TODO: Implement bookmark functionality
+          
           },
         ),
       ],
@@ -202,7 +170,7 @@ class _CardDetailedState extends State<CardDetailed> {
                 ? null
                 : () {
                     Navigator.pop(context);
-                    _sendMessage(context);
+                    
                   },
           ),
         ],
@@ -251,6 +219,7 @@ class _CardDetailedState extends State<CardDetailed> {
       },
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -331,7 +300,7 @@ class _CardDetailedState extends State<CardDetailed> {
                       ),
                     ),
                     const SizedBox(height: 24),
-                    _buildAuthorInfo(),
+                    //_buildAuthorInfo(),
                     const SizedBox(height: 24),
                     Text(
                       widget.description,

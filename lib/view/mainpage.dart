@@ -163,7 +163,7 @@ class _MainPageState extends State<MainPage> {
                                 title: document.data['title']?.toString() ?? '',
                                 description: document.data['description']?.toString() ?? '',
                                 image: document.data['postimage']?.toString() ?? '',
-                                author: document.data['user']['username']?.toString() ?? '',
+                                author: document,
                                 date: DateTime.tryParse(document.data['created_at']?.toString() ?? '') ?? DateTime.now(),
                                 category: 'cards',
                               );
