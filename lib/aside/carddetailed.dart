@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:kindkarma/aside/personemessage.dart';
 import 'package:kindkarma/utils/utility.dart';
 
 class CardDetailed extends StatefulWidget {
@@ -120,7 +121,7 @@ class _CardDetailedState extends State<CardDetailed> {
         IconButton(
           icon: const Icon(Icons.share, color: Colors.white),
           onPressed: () {
-            // TODO: Implement share functionality
+            
           },
         ),
         IconButton(
@@ -235,7 +236,7 @@ class _CardDetailedState extends State<CardDetailed> {
         foregroundColor: surfaceColor,
         elevation: 4,
         onPressed: (){
-          debugPrint('message author');
+          Navigator.push(context, MaterialPageRoute(builder: (context) => Personemessage(userDocuments: widget.author,)));
         },
         child: const Icon(Icons.comment),
       ),

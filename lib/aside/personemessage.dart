@@ -10,7 +10,7 @@ import 'package:kindkarma/utils/utility.dart';
 import 'package:provider/provider.dart';
 
 class Personemessage extends StatefulWidget {
-  final Document userDocuments;
+  final Map<String,dynamic> userDocuments;
   const Personemessage({super.key, required this.userDocuments});
 
   @override
@@ -223,10 +223,11 @@ class _PersonemessageState extends State<Personemessage> {
           contentPadding: EdgeInsets.zero,
           leading: const CircleAvatar(
             radius: 20,
-            backgroundImage: NetworkImage('https://appwrite.io/images/brand-assets/appwrite-logo-dark.png'),
+            backgroundColor: primaryGreen,
+            child: Icon(Icons.person, color: Colors.white),
           ),
           title: Text(
-            widget.userDocuments.data['username'],
+            widget.userDocuments['username'],
             style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
