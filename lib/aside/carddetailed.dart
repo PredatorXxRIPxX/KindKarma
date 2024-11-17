@@ -1,13 +1,7 @@
-import 'package:appwrite/appwrite.dart';
-import 'package:appwrite/models.dart';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:kindkarma/api/api.dart';
-import 'package:kindkarma/aside/personemessage.dart';
-import 'package:kindkarma/controllers/userprovider.dart';
-import 'package:kindkarma/utils/notificationBuilder.dart';
 import 'package:kindkarma/utils/utility.dart';
-import 'package:provider/provider.dart';
 
 class CardDetailed extends StatefulWidget {
   final String title;
@@ -32,15 +26,11 @@ class CardDetailed extends StatefulWidget {
 class _CardDetailedState extends State<CardDetailed> {
   late final ScrollController _scrollController;
   bool _showAppBarTitle = false;
-  String _message = '';
-  late final Userprovider _userProvider;
   final _messageController = TextEditingController();
 
   @override
   void initState() {
-    print(widget.author['username'].toString());
     super.initState();
-    _userProvider = Provider.of<Userprovider>(context, listen: false);
     _scrollController = ScrollController()
       ..addListener(_handleScroll);
   }
@@ -61,7 +51,6 @@ class _CardDetailedState extends State<CardDetailed> {
   }
 
   String _formatDate(DateTime date) {
-    print(widget.author['username'].toString());
     return DateFormat('MMMM d, yyyy').format(date);
   }
 
@@ -84,11 +73,12 @@ class _CardDetailedState extends State<CardDetailed> {
   }
 
   Widget _buildAuthorAvatar() {
+    String username = widget.author['username'].toString();
     return CircleAvatar(
       radius: 24,
       backgroundColor: primaryGreen,
       child: Text(
-        widget.author['username'] || widget.author['username'] != null ? widget.author['username'].toString() : 'Unknown',
+        username[0].toUpperCase(),
         style: const TextStyle(
           color: surfaceColor,
           fontSize: 20,
@@ -104,7 +94,7 @@ class _CardDetailedState extends State<CardDetailed> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          widget.author['username'].isNotEmpty || widget.author['username'] != null ? widget.author['username'].toString() : 'Unkonwn',
+          widget.author['username'].toString(),
           style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
@@ -142,84 +132,6 @@ class _CardDetailedState extends State<CardDetailed> {
       ],
     );
   }
-
-  Widget _buildMessageInput() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: _messageController,
-              cursorColor: primaryGreen,
-              decoration: const InputDecoration(
-                hintText: 'Write a message...',
-                hintStyle: TextStyle(color: Colors.grey),
-                border: InputBorder.none,
-              ),
-              style: const TextStyle(color: Colors.white),
-              onChanged: (value) => setState(() => _message = value),
-            ),
-          ),
-          IconButton(
-            icon: Icon(
-              Icons.send,
-              color: _message.trim().isEmpty ? Colors.grey : primaryGreen,
-            ),
-            onPressed: _message.trim().isEmpty
-                ? null
-                : () {
-                    Navigator.pop(context);
-                    
-                  },
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showMessageBottomSheet() {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return Container(
-          width: double.infinity,
-          height: 250,
-          decoration: const BoxDecoration(
-            color: surfaceColor,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-          ),
-          child: Column(
-            children: [
-              Container(
-                height: 4,
-                width: 40,
-                margin: const EdgeInsets.symmetric(vertical: 8),
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: Row(
-                  children: [
-                    _buildAuthorAvatar(),
-                    const SizedBox(width: 12),
-                    Expanded(child: _buildAuthorDetails()),
-                  ],
-                ),
-              ),
-              const Expanded(child: SizedBox()),
-              _buildMessageInput(),
-              const SizedBox(height: 16),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
 
   @override
   Widget build(BuildContext context) {
@@ -300,7 +212,7 @@ class _CardDetailedState extends State<CardDetailed> {
                       ),
                     ),
                     const SizedBox(height: 24),
-                    //_buildAuthorInfo(),
+                    _buildAuthorInfo(),
                     const SizedBox(height: 24),
                     Text(
                       widget.description,
@@ -322,7 +234,9 @@ class _CardDetailedState extends State<CardDetailed> {
         backgroundColor: primaryGreen,
         foregroundColor: surfaceColor,
         elevation: 4,
-        onPressed: _showMessageBottomSheet,
+        onPressed: (){
+          debugPrint('message author');
+        },
         child: const Icon(Icons.comment),
       ),
     );
