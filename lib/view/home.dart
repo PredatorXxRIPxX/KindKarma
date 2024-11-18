@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:animated_notch_bottom_bar/animated_notch_bottom_bar/animated_notch_bottom_bar.dart';
+import 'package:kindkarma/view/friendmessages.dart';
 import 'package:kindkarma/view/mainpage.dart';
 import 'package:kindkarma/view/profile.dart';
 import 'package:kindkarma/view/addcontent.dart';
@@ -152,8 +153,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
   }
 
   void _handleMessageTap() {
-    
-    debugPrint('Message button tapped');
+    Navigator.push(context, MaterialPageRoute(builder: (context) => const Friendmessages()));
   }
 
   Widget _buildBottomBar() {
