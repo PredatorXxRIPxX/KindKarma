@@ -1,16 +1,14 @@
 import 'package:appwrite/appwrite.dart';
-import 'package:appwrite/models.dart';
 import 'package:chat_bubbles/chat_bubbles.dart';
 import 'package:flutter/material.dart';
 import 'package:kindkarma/api/api.dart';
 import 'package:kindkarma/controllers/userprovider.dart';
-import 'package:kindkarma/utils/messagemodel.dart';
 import 'package:kindkarma/utils/notificationBuilder.dart';
 import 'package:kindkarma/utils/utility.dart';
 import 'package:provider/provider.dart';
 
 class Personemessage extends StatefulWidget {
-  final Map<String,dynamic> author;
+  final Map<String, dynamic> author;
   const Personemessage({super.key, required this.author});
 
   @override
@@ -18,35 +16,60 @@ class Personemessage extends StatefulWidget {
 }
 
 class _PersonemessageState extends State<Personemessage> {
-  Map<String,dynamic>? reciever; 
+  Map<String, dynamic>? reciever;
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  late Stream<List<BubbleSpecialThree>> messages;
+  late Stream<List<BubbleSpecialThree>> messages = Stream.value([]);
   late Userprovider userprovider;
-  RealtimeSubscription? _subscription; 
+  RealtimeSubscription? _subscription;
 
-
-  Future <void> _sendMessage() async {
-    if(_messageController.text.isEmpty) return;
+  Future<void> _sendMessage() async {
+    if (_messageController.text.isEmpty) return;
     try {
-      await database.createDocument(databaseId: databaseid, collectionId: postCollectionid, documentId: ID.unique(),
-      data: {
-        'message': _messageController.text,
-        'sender_id': userprovider.userid,
-        'reciever_id': widget.author['iduser'],
-        'timestemp': DateTime.now().millisecondsSinceEpoch,
-        'isSeenByReciever': false,
-        'isImage':false
+      await database.createDocument(
+        databaseId: databaseid,
+        collectionId: chatCollectionid,
+        documentId: ID.unique(),
+        data: {
+          'message': _messageController.text,
+          'sender_id': userprovider.userid,
+          'reciever_id': widget.author['iduser'],
+          'timestemp': DateTime.now().toString(),
+          'isSeenByReciever': false,
+          'isImage': false
+        }
+      );
+      _messageController.clear();
+      
+      // Refresh messages stream
+      setState(() {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+        messages = getMessages();
       });
+      
+      // Scroll to bottom
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
     } catch (e) {
-      showErrorSnackBar('enable to send message', context);
+      showErrorSnackBar('Unable to send message, check your network', context);
     }
   }
 
-  Future<List<BubbleSpecialThree>>getMessages()async{
+  Stream<List<BubbleSpecialThree>> getMessages() async* {
+    if (reciever == null) yield [];
     try {
-      final response = await database.listDocuments(databaseId: databaseid, collectionId: chatCollectionid,queries: [
-         Query.or([
+      final response = await database.listDocuments(
+        databaseId: databaseid,
+        collectionId: chatCollectionid,
+        queries: [
+          Query.or([
             Query.and([
               Query.equal('sender_id', userprovider.userid),
               Query.equal('reciever_id', reciever!['iduser']),
@@ -56,28 +79,56 @@ class _PersonemessageState extends State<Personemessage> {
               Query.equal('reciever_id', userprovider.userid),
             ]),
           ]),
-          Query.orderAsc('timestamp'), 
-      ]);
-      return response.documents.map((e) => BubbleSpecialThree(
+          Query.orderDesc('timestemp'),
+        ]
+      );
+
+      yield response.documents.map((e) => BubbleSpecialThree(
         text: e.data['message'],
         isSender: e.data['sender_id'] == userprovider.userid,
         textStyle: TextStyle(color: e.data['sender_id'] == userprovider.userid ? Colors.white : Colors.black),
         color: e.data['sender_id'] == userprovider.userid ? primaryGreen : Colors.grey,
         tail: true,
-      )).toList();
+      )).toList().reversed.toList();
     } catch (e) {
-      showErrorSnackBar('enable to fetch messages', context);
-      return [];
+      showErrorSnackBar('Unable to fetch messages', context);
+      yield [];
     }
+  }
+
+  void _setupRealtimeSubscription() {
+    _subscription = realtime.subscribe(
+      ['databases.$databaseid.collections.$chatCollectionid.documents'],
+    );
+
+    _subscription?.stream.listen((response) {
+      if (response.events.contains('databases.$databaseid.collections.$chatCollectionid.documents.*.create')) {
+        final message = response.payload;
+        // Check if the message is related to current chat
+        if ((message['sender_id'] == userprovider.userid && message['reciever_id'] == reciever!['iduser']) ||
+            (message['sender_id'] == reciever!['iduser'] && message['reciever_id'] == userprovider.userid)) {
+          // Refresh messages stream
+          setState(() {
+            messages = getMessages();
+          });
+          
+          // Scroll to bottom
+          _scrollController.animateTo(
+            _scrollController.position.maxScrollExtent.floorToDouble(),
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          );
+        }
+      }
+    });
   }
 
   @override
   void initState() {
-    getMessages().then((value) {
-      setState(() {
-        messages = Stream.value(value);
-      });
-    });
+    userprovider = Provider.of<Userprovider>(context, listen: false);
+    reciever = widget.author;
+    _setupRealtimeSubscription();
+    messages = getMessages();
     super.initState();
   }
 
@@ -88,7 +139,6 @@ class _PersonemessageState extends State<Personemessage> {
     _subscription?.close();
     super.dispose();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -138,21 +188,27 @@ class _PersonemessageState extends State<Personemessage> {
               stream: messages,
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                  return ListView.builder(
-                    controller: _scrollController,
-                    itemCount: snapshot.data!.length,
-                    itemBuilder: (context, index) {
-                      return snapshot.data![index];
-                    },
-                  );
+                  if (snapshot.data!.isEmpty) {
+                    return const Center(
+                      child: Text('No messages'),
+                    );
+                  } else {
+                    return ListView.builder(
+                      controller: _scrollController,
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (context, index) {
+                        return snapshot.data![index];
+                      },
+                    );
+                  }
                 }
-                if(snapshot.hasError){
+                if (snapshot.hasError) {
                   return const Center(
-                    child: Text('Error occured'),
+                    child: Text('Error occurred'),
                   );
                 }
                 return const Center(
-                  child: CircularProgressIndicator(),
+                  child: CircularProgressIndicator(color: primaryGreen),
                 );
               },
             ),
