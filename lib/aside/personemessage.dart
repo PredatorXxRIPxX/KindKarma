@@ -1,8 +1,8 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
+import 'package:chat_bubbles/chat_bubbles.dart';
 import 'package:flutter/material.dart';
 import 'package:kindkarma/api/api.dart';
-import 'package:kindkarma/components/chatmessage.dart';
 import 'package:kindkarma/controllers/userprovider.dart';
 import 'package:kindkarma/utils/messagemodel.dart';
 import 'package:kindkarma/utils/notificationBuilder.dart';
@@ -10,203 +10,85 @@ import 'package:kindkarma/utils/utility.dart';
 import 'package:provider/provider.dart';
 
 class Personemessage extends StatefulWidget {
-  final Map<String,dynamic> userDocuments;
-  const Personemessage({super.key, required this.userDocuments});
+  final Map<String,dynamic> author;
+  const Personemessage({super.key, required this.author});
 
   @override
   State<Personemessage> createState() => _PersonemessageState();
 }
 
 class _PersonemessageState extends State<Personemessage> {
-  Document? reciever; 
+  Map<String,dynamic>? reciever; 
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  final List<Messagemodel> messages = [];
+  late Stream<List<BubbleSpecialThree>> messages;
   late Userprovider userprovider;
   RealtimeSubscription? _subscription; 
 
-  @override
-  void initState() {
-    super.initState();
-    userprovider = Provider.of<Userprovider>(context, listen: false);
-    
-  }
 
-  void _setupRealtimeSubscription() {
-    _subscription = realtime.subscribe([
-      'databases.$databaseid.collections.$chatCollectionid.documents'
-    ]);
-
-    _subscription?.stream.listen((response) {
-      if (response.events.contains(
-        'databases.$databaseid.collections.$chatCollectionid.documents.*.create'
-      )) {
-        final message = Messagemodel.fromJson(response.payload);
-        if ((message.senderId == userprovider.userid && 
-             message.receiverId == reciever?.data['recieverid']) ||
-            (message.senderId == reciever?.data['recieverid'] && 
-             message.receiverId == userprovider.userid)) {
-          setState(() {
-            messages.add(message);
-          });
-          _scrollToBottom();
-        }
-      }
-    });
-  }
-
-  Future<void> _loadInitialMessages() async {
+  Future <void> _sendMessage() async {
+    if(_messageController.text.isEmpty) return;
     try {
-      if (reciever == null) return;
-      
-      final chatHistory = await getChatHistory(reciever!.data['recieverid']);
-      setState(() {
-        messages.clear();
-        messages.addAll(chatHistory);
+      await database.createDocument(databaseId: databaseid, collectionId: postCollectionid, documentId: ID.unique(),
+      data: {
+        'message': _messageController.text,
+        'sender_id': userprovider.userid,
+        'reciever_id': widget.author['iduser'],
+        'timestemp': DateTime.now().millisecondsSinceEpoch,
+        'isSeenByReciever': false,
+        'isImage':false
       });
     } catch (e) {
-      showErrorSnackBar('Failed to load messages', context);
+      showErrorSnackBar('enable to send message', context);
     }
   }
 
-  void _scrollToBottom() {
-    if (_scrollController.hasClients) {
-      _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
-    }
-  }
-
-  Future<void> _sendMessage() async {
-    final message = _messageController.text.trim();
-    if (message.isEmpty || reciever == null) {
-      return;
-    }
-    
+  Future<List<BubbleSpecialThree>>getMessages()async{
     try {
-      await database.createDocument(
-        databaseId: databaseid,
-        collectionId: chatCollectionid,
-        documentId: ID.unique(),
-        data: {
-          'message': message,
-          'sender': userprovider.userid,
-          'reciever': reciever!.data['recieverid'],
-          'timestamp': DateTime.now().millisecondsSinceEpoch,
-          'isSeenByReciever': false,
-          'isImage': false,
-        },
-      );
-      _messageController.clear();
-      _scrollToBottom();
-    } catch (e) {
-      showErrorSnackBar('Unable to send message. Check your network', context);
-    }
-  }
-
-  Future<List<Messagemodel>> getChatHistory(String receiverId) async {
-    try {
-      final response = await database.listDocuments(
-        databaseId: databaseid,
-        collectionId: chatCollectionid,
-        queries: [
-          Query.or([
+      final response = await database.listDocuments(databaseId: databaseid, collectionId: chatCollectionid,queries: [
+         Query.or([
             Query.and([
-              Query.equal('sender', userprovider.userid),
-              Query.equal('reciever', receiverId),
+              Query.equal('sender_id', userprovider.userid),
+              Query.equal('reciever_id', reciever!['iduser']),
             ]),
             Query.and([
-              Query.equal('sender', receiverId),
-              Query.equal('reciever', userprovider.userid),
+              Query.equal('sender_id', reciever!['iduser']),
+              Query.equal('reciever_id', userprovider.userid),
             ]),
           ]),
           Query.orderAsc('timestamp'), 
-        ],
-      );
-
-      return response.documents
-          .map((doc) => Messagemodel.fromJson(doc.data))
-          .toList();
+      ]);
+      return response.documents.map((e) => BubbleSpecialThree(
+        text: e.data['message'],
+        isSender: e.data['sender_id'] == userprovider.userid,
+        textStyle: TextStyle(color: e.data['sender_id'] == userprovider.userid ? Colors.white : Colors.black),
+        color: e.data['sender_id'] == userprovider.userid ? primaryGreen : Colors.grey,
+        tail: true,
+      )).toList();
     } catch (e) {
-      print('Error getting chat history: $e');
+      showErrorSnackBar('enable to fetch messages', context);
       return [];
     }
   }
 
-  Future<void> _fetchReciever(String email) async {
-    try {
-      final response = await database.listDocuments(
-        databaseId: databaseid, 
-        collectionId: userCollectionid,
-        queries: [Query.equal('email', email)]
-      );
-      
-      if (response.documents.isEmpty) {
-        throw Exception('User not found');
-      }
+  @override
+  void initState() {
+    getMessages().then((value) {
       setState(() {
-        reciever = response.documents.first;
+        messages = Stream.value(value);
       });
-    } catch (e) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Error'),
-          content: const Text('Unable to find user. Try again later'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('OK'),
-            ),
-          ],
-        ),
-      );
-    }
-  }
-
-  Stream<List<Chatmessage>> _getMessages(String receiverId) async* {
-    try {
-      final response = await database.listDocuments(
-        databaseId: databaseid,
-        collectionId: chatCollectionid,
-        queries: [
-          Query.or([
-            Query.and([
-              Query.equal('sender', userprovider.userid),
-              Query.equal('reciever', receiverId),
-            ]),
-            Query.and([
-              Query.equal('sender', receiverId),
-              Query.equal('reciever', userprovider.userid),
-            ]),
-          ]),
-          Query.orderAsc('timestamp'),
-        ],
-      );
-
-      yield response.documents.map((doc) {
-        final data = doc.data;
-        return Chatmessage(
-          message: data['message'],
-          isMe: data['sender'] == userprovider.userid,
-          timestamp: DateTime.fromMillisecondsSinceEpoch(data['timestamp']),
-        );
-      }).toList();
-    } catch (e) {
-      print('Error getting messages: $e');
-      yield [];
-    }
+    });
+    super.initState();
   }
 
   @override
   void dispose() {
-    _subscription?.close();
-    _messageController.dispose();
     _scrollController.dispose();
+    _messageController.dispose();
+    _subscription?.close();
     super.dispose();
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -227,7 +109,7 @@ class _PersonemessageState extends State<Personemessage> {
             child: Icon(Icons.person, color: Colors.white),
           ),
           title: Text(
-            widget.userDocuments['username'],
+            widget.author['username'],
             style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
@@ -252,38 +134,25 @@ class _PersonemessageState extends State<Personemessage> {
       body: Column(
         children: [
           Expanded(
-            child: StreamBuilder<List<Chatmessage>>(
-              stream: reciever != null 
-                ? _getMessages(reciever!.data['recieverid'])
-                : Stream.value([]),
+            child: StreamBuilder<List<BubbleSpecialThree>>(
+              stream: messages,
               builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
+                if (snapshot.hasData) {
+                  return ListView.builder(
+                    controller: _scrollController,
+                    itemCount: snapshot.data!.length,
+                    itemBuilder: (context, index) {
+                      return snapshot.data![index];
+                    },
+                  );
+                }
+                if(snapshot.hasError){
                   return const Center(
-                    child: CircularProgressIndicator(),
+                    child: Text('Error occured'),
                   );
                 }
-
-                if (snapshot.hasError) {
-                  return Center(
-                    child: Text(
-                      'An error occurred: ${snapshot.error}',
-                    ),
-                  );
-                }
-
-                final messages = snapshot.data ?? [];
-
-                return ListView.builder(
-                  controller: _scrollController,
-                  itemCount: messages.length,
-                  itemBuilder: (context, index) {
-                    final message = messages[index];
-                    return Chatmessage(
-                      message: message.message,
-                      isMe: message.isMe,
-                      timestamp: message.timestamp,
-                    );
-                  },
+                return const Center(
+                  child: CircularProgressIndicator(),
                 );
               },
             ),
