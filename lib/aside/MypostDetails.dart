@@ -37,6 +37,7 @@ class _PostDetailsState extends State<PostDetails> {
   XFile? image;
   late Userprovider userprovider;
   bool isuploading = false;
+  final idPost = ID.unique();
 
   @override
   void initState() {
@@ -79,6 +80,7 @@ class _PostDetailsState extends State<PostDetails> {
             'title': _titleController.text,
             'description': _descriptionController.text,
             'created_at': DateTime.now().toIso8601String(),
+            'postimage': idPost,
           });
 
       Navigator.pop(context, true);
@@ -146,7 +148,6 @@ class _PostDetailsState extends State<PostDetails> {
                       icon: Icons.camera_alt,
                       label: 'Camera',
                       onTap: () {
-                        Navigator.pop(context);
                         addContent(context, 'camera');
                       },
                     ),
@@ -155,7 +156,6 @@ class _PostDetailsState extends State<PostDetails> {
                       icon: Icons.image,
                       label: 'Gallery',
                       onTap: () {
-                        Navigator.pop(context);
                         addContent(context, 'gallery');
                       },
                     ),
@@ -195,6 +195,8 @@ class _PostDetailsState extends State<PostDetails> {
           queries: [
             Query.equal('idpost', widget.id),
           ]);
+          
+      print(docid.documents.first.data.toString());
 
       await storage.deleteFile(
           bucketId: storageid, fileId: docid.documents.first.data['postimage']);
@@ -212,7 +214,7 @@ class _PostDetailsState extends State<PostDetails> {
           collectionId: postCollectionid,
           documentId: docid.documents.first.$id,
           data: {
-            'idpost': idPost,
+            'postimage': idPost,
           });
       showSuccessSnackBar('Content added successfully', context);
     } catch (e) {
@@ -277,6 +279,7 @@ class _PostDetailsState extends State<PostDetails> {
     setState(() {
       image = pickedFile;
     });
+    _uploadcontent(context);
   }
 
   Future<void> _deletePost() async {
