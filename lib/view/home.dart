@@ -4,7 +4,7 @@ import 'package:kindkarma/view/friendmessages.dart';
 import 'package:kindkarma/view/mainpage.dart';
 import 'package:kindkarma/view/profile.dart';
 import 'package:kindkarma/view/addcontent.dart';
-import 'package:kindkarma/view/notificationpage.dart';
+import 'package:kindkarma/view/myposts.dart';
 import 'package:kindkarma/view/search.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -15,15 +15,51 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateMixin {
-  static const double _kBottomBarHeight = 75;
-  static const double _kBottomRadius = 28;
-  static const double _kIconSize = 24;
-  static const Duration _kAnimationDuration = Duration(milliseconds: 300);
+  // Move constants to a separate class for better organization
+  static const _UIConstants = _HomePageUIConstants();
+  
   late final PageController _pageController;
   late final NotchBottomBarController _bottomBarController;
   
   int _currentPage = 0;
   bool _isPageViewAnimating = false;
+
+  // Define pages and navigation items as static const for better performance
+  static const List<Widget> _pages = [
+    MainPage(),
+    Search(),
+    AddContent(),
+    Myposts(),
+    Profile(),
+  ];
+
+  static const List<NavigationItemData> _navigationItems = [
+    NavigationItemData(
+      activeIcon: Icons.home_rounded,
+      inactiveIcon: Icons.home_outlined,
+      label: 'Home'
+    ),
+    NavigationItemData(
+      activeIcon: Icons.search_rounded,
+      inactiveIcon: Icons.search_outlined,
+      label: 'Search'
+    ),
+    NavigationItemData(
+      activeIcon: Icons.add_circle_rounded,
+      inactiveIcon: Icons.add_circle_outline_rounded,
+      label: 'Add'
+    ),
+    NavigationItemData(
+      activeIcon: Icons.bookmark_rounded,
+      inactiveIcon: Icons.bookmark_outline,
+      label: 'My Posts'
+    ),
+    NavigationItemData(
+      activeIcon: Icons.person_rounded,
+      inactiveIcon: Icons.person_outline_rounded,
+      label: 'Profile'
+    ),
+  ];
 
   @override
   void initState() {
@@ -39,24 +75,6 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
     super.dispose();
   }
 
-
-  final List<Widget> _pages = const [
-    MainPage(),
-    Search(),
-    AddContent(),
-    Notificationpage(),
-    Profile(),
-  ];
-
-
-  final List<({IconData activeIcon, IconData inactiveIcon, String label})> _navigationItems = const [
-    (activeIcon: Icons.home_rounded, inactiveIcon: Icons.home_outlined, label: 'Home'),
-    (activeIcon: Icons.search_rounded, inactiveIcon: Icons.search_outlined, label: 'Search'),
-    (activeIcon: Icons.add_circle_rounded, inactiveIcon: Icons.add_circle_outline_rounded, label: 'Add'),
-    (activeIcon: Icons.bookmark_rounded, inactiveIcon: Icons.bookmark_outline, label: 'My Posts'),
-    (activeIcon: Icons.person_rounded, inactiveIcon: Icons.person_outline_rounded, label: 'Profile'),
-  ];
-
   Future<void> _handlePageChange(int index) async {
     if (_isPageViewAnimating) return;
     
@@ -68,7 +86,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
     try {
       await _pageController.animateToPage(
         index,
-        duration: _kAnimationDuration,
+        duration: _UIConstants.animationDuration,
         curve: Curves.easeInOut,
       );
     } catch (e) {
@@ -80,23 +98,32 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
     }
   }
 
+  void _handleMessageTap() {
+    Navigator.push<void>(
+      context,
+      MaterialPageRoute(builder: (context) => const Friendmessages()),
+    );
+  }
+
   PreferredSizeWidget _buildAppBar() {
     return AppBar(
       elevation: 0,
       backgroundColor: ThemeColors.surfaceColor,
       title: Row(
         children: [
-          Container(
-            padding: const EdgeInsets.all(8),
+          DecoratedBox(
             decoration: BoxDecoration(
               color: ThemeColors.accentColor.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: ThemeColors.accentColor.withOpacity(0.3)),
             ),
-            child: const Icon(
-              Icons.volunteer_activism,
-              color: ThemeColors.primaryGreen,
-              size: 24,
+            child: const Padding(
+              padding: EdgeInsets.all(8),
+              child: Icon(
+                Icons.volunteer_activism,
+                color: ThemeColors.primaryGreen,
+                size: 24,
+              ),
             ),
           ),
           const SizedBox(width: 12),
@@ -112,52 +139,14 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
         ],
       ),
       actions: [
-        _buildMessageButton(),
+        _MessageButton(onTap: _handleMessageTap),
         const SizedBox(width: 12),
       ],
     );
   }
 
-  Widget _buildMessageButton() {
-    return Stack(
-      children: [
-        IconButton(
-          icon: const Icon(
-            Icons.message_outlined,
-            color: Colors.white,
-            size: 24,
-          ),
-          onPressed: () => _handleMessageTap(),
-        ),
-        Positioned(
-          right: 8,
-          top: 8,
-          child: Container(
-            padding: const EdgeInsets.all(4),
-            decoration: const BoxDecoration(
-              color: ThemeColors.primaryGreen,
-              shape: BoxShape.circle,
-            ),
-            child: const Text(
-              '2',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  void _handleMessageTap() {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => const Friendmessages()));
-  }
-
   Widget _buildBottomBar() {
-    return Container(
+    return DecoratedBox(
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
@@ -170,13 +159,13 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
       ),
       child: AnimatedNotchBottomBar(
         color: ThemeColors.surfaceColor,
-        durationInMilliSeconds: _kAnimationDuration.inMilliseconds,
+        durationInMilliSeconds: _UIConstants.animationDuration.inMilliseconds,
         notchBottomBarController: _bottomBarController,
         blurOpacity: 0,
-        bottomBarHeight: _kBottomBarHeight,
+        bottomBarHeight: _UIConstants.bottomBarHeight,
         bottomBarWidth: MediaQuery.of(context).size.width,
-        kBottomRadius: _kBottomRadius,
-        kIconSize: _kIconSize,
+        kBottomRadius: _UIConstants.bottomRadius,
+        kIconSize: _UIConstants.iconSize,
         onTap: _handlePageChange,
         bottomBarItems: _navigationItems
             .map((item) => _buildBottomBarItem(item.activeIcon, item.inactiveIcon))
@@ -216,6 +205,70 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
   }
 }
 
+// Separate class for UI constants
+class _HomePageUIConstants {
+  final double bottomBarHeight = 75;
+  final double bottomRadius = 28;
+  final double iconSize = 24;
+  final Duration animationDuration = const Duration(milliseconds: 300);
+
+  const _HomePageUIConstants();
+}
+
+class NavigationItemData {
+  final IconData activeIcon;
+  final IconData inactiveIcon;
+  final String label;
+
+  const NavigationItemData({
+    required this.activeIcon,
+    required this.inactiveIcon,
+    required this.label,
+  });
+}
+
+
+class _MessageButton extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _MessageButton({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        IconButton(
+          icon: const Icon(
+            Icons.message_outlined,
+            color: Colors.white,
+            size: 24,
+          ),
+          onPressed: onTap,
+        ),
+        Positioned(
+          right: 8,
+          top: 8,
+          child: Container(
+            padding: const EdgeInsets.all(4),
+            decoration: const BoxDecoration(
+              color: ThemeColors.primaryGreen,
+              shape: BoxShape.circle,
+            ),
+            child: const Text(
+              '2',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class ThemeColors {
   static const Color primaryGreen = Color(0xFF4CAF50);
   static const Color darkBackground = Color(0xFF121212);
@@ -223,5 +276,5 @@ class ThemeColors {
   static const Color accentColor = Color(0xFF2E7D32);
   static const Color cardColor = Color(0xFF252525);
 
-  const ThemeColors._(); 
+  const ThemeColors._();
 }
