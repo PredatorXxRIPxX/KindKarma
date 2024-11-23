@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kindkarma/api/api.dart';
 import 'package:intl/intl.dart';
+import 'package:kindkarma/aside/MypostDetails.dart';
 
 class MyPostCard extends StatelessWidget {
   final String title;
@@ -46,144 +47,149 @@ class MyPostCard extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
     final imageHeight = screenWidth * 0.5;
 
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: ThemeColors.cardColor,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-            child: Stack(
-              children: [
-                Image.network(
-                  getImageViewLink(postImage),
-                  height: imageHeight,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return Container(
-                      height: imageHeight,
-                      color: Colors.grey[800],
-                      child: Center(
-                        child: CircularProgressIndicator(
-                          value: loadingProgress.expectedTotalBytes != null
-                              ? loadingProgress.cumulativeBytesLoaded /
-                                  loadingProgress.expectedTotalBytes!
-                              : null,
-                          valueColor: const AlwaysStoppedAnimation<Color>(
-                            ThemeColors.primaryGreen,
+    return InkWell(
+      onTap: () {
+        Navigator.of(context).push(MaterialPageRoute(builder: (context) => PostDetails(title: title,description: description,postImage: postImage,createdAt: createdAt,) ));
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: ThemeColors.cardColor,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+              child: Stack(
+                children: [
+                  Image.network(
+                    getImageViewLink(postImage),
+                    height: imageHeight,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Container(
+                        height: imageHeight,
+                        color: Colors.grey[800],
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            value: loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded /
+                                    loadingProgress.expectedTotalBytes!
+                                : null,
+                            valueColor: const AlwaysStoppedAnimation<Color>(
+                              ThemeColors.primaryGreen,
+                            ),
                           ),
                         ),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      height: imageHeight,
+                      color: Colors.grey[800],
+                      child: const Icon(
+                        Icons.error_outline,
+                        color: Colors.white54,
+                        size: 32,
                       ),
-                    );
-                  },
-                  errorBuilder: (context, error, stackTrace) => Container(
-                    height: imageHeight,
-                    color: Colors.grey[800],
-                    child: const Icon(
-                      Icons.error_outline,
-                      color: Colors.white54,
-                      size: 32,
                     ),
                   ),
-                ),
-                // Gradient overlay
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  height: 80,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.bottomCenter,
-                        end: Alignment.topCenter,
-                        colors: [
-                          Colors.black.withOpacity(0.7),
-                          Colors.transparent,
+                  // Gradient overlay
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    height: 80,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.bottomCenter,
+                          end: Alignment.topCenter,
+                          colors: [
+                            Colors.black.withOpacity(0.7),
+                            Colors.transparent,
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+      
+            // Content Section
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Title
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 8),
+                  
+                  // Description
+                  Text(
+                    description,
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.8),
+                      fontSize: 16,
+                      height: 1.5,
+                    ),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  
+                  const SizedBox(height: 16),
+                  
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          _buildInteractionButton(
+                            Icons.favorite_border,
+                            '24',
+                          ),
+                          const SizedBox(width: 16),
+                          _buildInteractionButton(
+                            Icons.chat_bubble_outline,
+                            '8',
+                          ),
                         ],
                       ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Content Section
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Title
-                Text(
-                  title,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-                
-                const SizedBox(height: 8),
-                
-                // Description
-                Text(
-                  description,
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.8),
-                    fontSize: 16,
-                    height: 1.5,
-                  ),
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                
-                const SizedBox(height: 16),
-                
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        _buildInteractionButton(
-                          Icons.favorite_border,
-                          '24',
+                      Text(
+                        _formatDate(createdAt),
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.6),
+                          fontSize: 14,
                         ),
-                        const SizedBox(width: 16),
-                        _buildInteractionButton(
-                          Icons.chat_bubble_outline,
-                          '8',
-                        ),
-                      ],
-                    ),
-                    Text(
-                      _formatDate(createdAt),
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.6),
-                        fontSize: 14,
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
