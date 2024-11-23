@@ -53,7 +53,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
     (activeIcon: Icons.home_rounded, inactiveIcon: Icons.home_outlined, label: 'Home'),
     (activeIcon: Icons.search_rounded, inactiveIcon: Icons.search_outlined, label: 'Search'),
     (activeIcon: Icons.add_circle_rounded, inactiveIcon: Icons.add_circle_outline_rounded, label: 'Add'),
-    (activeIcon: Icons.notifications_rounded, inactiveIcon: Icons.notifications_outlined, label: 'Notifications'),
+    (activeIcon: Icons.bookmark_rounded, inactiveIcon: Icons.bookmark_outline, label: 'My Posts'),
     (activeIcon: Icons.person_rounded, inactiveIcon: Icons.person_outline_rounded, label: 'Profile'),
   ];
 
