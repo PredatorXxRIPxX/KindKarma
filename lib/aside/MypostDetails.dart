@@ -71,7 +71,6 @@ class _PostDetailsState extends State<PostDetails> {
           queries: [
             Query.equal('idpost', widget.id),
           ]);
-
       database.updateDocument(
           databaseId: databaseid,
           collectionId: postCollectionid,
@@ -80,7 +79,6 @@ class _PostDetailsState extends State<PostDetails> {
             'title': _titleController.text,
             'description': _descriptionController.text,
             'created_at': DateTime.now().toIso8601String(),
-            'postimage': idPost,
           });
 
       Navigator.pop(context, true);
@@ -92,7 +90,7 @@ class _PostDetailsState extends State<PostDetails> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Post updated successfully'),
+            content: Text('Post updated successfully + image' ),
             backgroundColor: ThemeColors.primaryGreen,
           ),
         );
@@ -195,8 +193,6 @@ class _PostDetailsState extends State<PostDetails> {
           queries: [
             Query.equal('idpost', widget.id),
           ]);
-          
-      print(docid.documents.first.data.toString());
 
       await storage.deleteFile(
           bucketId: storageid, fileId: docid.documents.first.data['postimage']);
@@ -214,9 +210,13 @@ class _PostDetailsState extends State<PostDetails> {
           collectionId: postCollectionid,
           documentId: docid.documents.first.$id,
           data: {
-            'postimage': idPost,
+            'title': _titleController.text,
+            'description': _descriptionController.text,
+            'created_at': DateTime.now().toIso8601String(),
+            'postimage': fileId,
+            'idpost': idPost,
           });
-      showSuccessSnackBar('Content added successfully', context);
+      showSuccessSnackBar('Content added successfully updated image', context);
     } catch (e) {
       showErrorSnackBar('check your network connection', context);
     } finally {
@@ -541,7 +541,10 @@ class _PostDetailsState extends State<PostDetails> {
                     onPressed: _isLoading
                         ? null
                         : () => setState(() => _isEditing = false),
-                    child: const Text('Cancel'),
+                    child: const Text(
+                      'Cancel',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                   const SizedBox(width: 16),
                   ElevatedButton(
