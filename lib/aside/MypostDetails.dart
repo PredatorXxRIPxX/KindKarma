@@ -1,8 +1,15 @@
+import 'package:appwrite/appwrite.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:kindkarma/api/api.dart';
 import 'package:intl/intl.dart';
+import 'package:kindkarma/controllers/userprovider.dart';
+import 'package:kindkarma/utils/notificationBuilder.dart';
+import 'package:kindkarma/utils/utility.dart';
+import 'package:provider/provider.dart';
 
 class PostDetails extends StatefulWidget {
+  final String id;
   final String title;
   final String description;
   final String postImage;
@@ -10,6 +17,7 @@ class PostDetails extends StatefulWidget {
 
   const PostDetails({
     super.key,
+    required this.id,
     required this.title,
     required this.description,
     required this.postImage,
@@ -26,10 +34,14 @@ class _PostDetailsState extends State<PostDetails> {
   bool _isEditing = false;
   bool _isLoading = false;
   String? _errorMessage;
+  XFile? image;
+  late Userprovider userprovider;
+  bool isuploading = false;
 
   @override
   void initState() {
     super.initState();
+    userprovider = Provider.of<Userprovider>(context, listen: false);
     _titleController = TextEditingController(text: widget.title);
     _descriptionController = TextEditingController(text: widget.description);
   }
@@ -52,18 +64,29 @@ class _PostDetailsState extends State<PostDetails> {
     });
 
     try {
-      // Add your API call here to update the post
-      // Example:
-      // await updatePost(
-      //   id: widget.id,
-      //   title: _titleController.text,
-      //   description: _descriptionController.text,
-      // );
+      final idDoc = await database.listDocuments(
+          databaseId: databaseid,
+          collectionId: postCollectionid,
+          queries: [
+            Query.equal('idpost', widget.id),
+          ]);
+
+      database.updateDocument(
+          databaseId: databaseid,
+          collectionId: postCollectionid,
+          documentId: idDoc.documents.first.$id,
+          data: {
+            'title': _titleController.text,
+            'description': _descriptionController.text,
+            'created_at': DateTime.now().toIso8601String(),
+          });
+
+      Navigator.pop(context, true);
 
       setState(() {
         _isEditing = false;
       });
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -83,6 +106,179 @@ class _PostDetailsState extends State<PostDetails> {
     }
   }
 
+  Future<Widget?> selectSource(BuildContext context) {
+    return showModalBottomSheet<Widget>(
+      backgroundColor: surfaceColor,
+      elevation: 7.0,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      context: context,
+      builder: (BuildContext context) {
+        return SizedBox(
+          height: MediaQuery.of(context).size.height * 0.25,
+          child: Column(
+            children: [
+              Container(
+                margin: const EdgeInsets.only(top: 8),
+                height: 4,
+                width: 40,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'Select Source',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _buildOptionButton(
+                      context: context,
+                      icon: Icons.camera_alt,
+                      label: 'Camera',
+                      onTap: () {
+                        Navigator.pop(context);
+                        addContent(context, 'camera');
+                      },
+                    ),
+                    _buildOptionButton(
+                      context: context,
+                      icon: Icons.image,
+                      label: 'Gallery',
+                      onTap: () {
+                        Navigator.pop(context);
+                        addContent(context, 'gallery');
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _uploadcontent(BuildContext context) async {
+    if (_titleController.text.isEmpty ||
+        _descriptionController.text.isEmpty ||
+        image == null) {
+      showInfoSnackBar('you need to fill all the information', context);
+      return;
+    }
+    isuploading = true;
+    if (isuploading) {
+      showDialog(
+          context: context,
+          builder: (context) {
+            return const Center(
+              child: CircularProgressIndicator(
+                color: primaryGreen,
+              ),
+            );
+          });
+    }
+    try {
+      final docid = await database.listDocuments(
+          databaseId: databaseid,
+          collectionId: postCollectionid,
+          queries: [
+            Query.equal('idpost', widget.id),
+          ]);
+
+      await storage.deleteFile(
+          bucketId: storageid, fileId: docid.documents.first.data['postimage']);
+
+      final fileId = ID.unique();
+      final idPost = ID.unique();
+
+      await storage.createFile(
+          bucketId: storageid,
+          fileId: fileId,
+          file: InputFile.fromPath(path: image!.path));
+
+      await database.updateDocument(
+          databaseId: databaseid,
+          collectionId: postCollectionid,
+          documentId: docid.documents.first.$id,
+          data: {
+            'idpost': idPost,
+          });
+      showSuccessSnackBar('Content added successfully', context);
+    } catch (e) {
+      showErrorSnackBar('check your network connection', context);
+    } finally {
+      setState(() {
+        isuploading = false;
+      });
+      Navigator.pop(context);
+    }
+  }
+
+  Widget _buildOptionButton({
+    required BuildContext context,
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(15),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              color: primaryGreen,
+              size: 50,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              style: const TextStyle(
+                color: primaryGreen,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> addContent(BuildContext context, String source) async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? pickedFile;
+
+    if (source == 'camera') {
+      pickedFile =
+          await picker.pickImage(source: ImageSource.camera, imageQuality: 80);
+    } else {
+      pickedFile =
+          await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+    }
+
+    setState(() {
+      image = pickedFile;
+    });
+  }
+
   Future<void> _deletePost() async {
     final shouldDelete = await showDialog<bool>(
       context: context,
@@ -99,7 +295,7 @@ class _PostDetailsState extends State<PostDetails> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: const Text('Cancel', style: TextStyle(color: Colors.white)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
@@ -120,12 +316,21 @@ class _PostDetailsState extends State<PostDetails> {
     });
 
     try {
-      // Add your API call here to delete the post
-      // Example:
-      // await deletePost(widget.id);
+      final idDoc = await database.listDocuments(
+          databaseId: databaseid,
+          collectionId: postCollectionid,
+          queries: [
+            Query.equal('idpost', widget.id),
+          ]);
+
+      await database.deleteDocument(
+        databaseId: databaseid,
+        collectionId: postCollectionid,
+        documentId: idDoc.documents.first.$id,
+      );
 
       if (mounted) {
-        Navigator.pop(context, true); // Return true to indicate post was deleted
+        Navigator.pop(context, true);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Post deleted successfully'),
@@ -149,16 +354,23 @@ class _PostDetailsState extends State<PostDetails> {
     return Scaffold(
       backgroundColor: ThemeColors.darkBackground,
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
         backgroundColor: ThemeColors.surfaceColor,
         title: const Text('Post Details'),
         actions: [
           if (!_isEditing)
             IconButton(
-              icon: const Icon(Icons.edit),
+              icon: const Icon(Icons.edit, color: Colors.white),
               onPressed: () => setState(() => _isEditing = true),
             ),
           IconButton(
-            icon: const Icon(Icons.delete),
+            icon: const Icon(Icons.delete, color: Colors.red),
             onPressed: _isLoading ? null : _deletePost,
           ),
         ],
@@ -167,7 +379,6 @@ class _PostDetailsState extends State<PostDetails> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image Section
             Stack(
               children: [
                 Image.network(
@@ -201,16 +412,18 @@ class _PostDetailsState extends State<PostDetails> {
                     bottom: 16,
                     right: 16,
                     child: FloatingActionButton(
+                      backgroundColor: primaryGreen,
                       onPressed: () {
-                        // Add image change functionality
+                        selectSource(context);
                       },
-                      child: const Icon(Icons.camera_alt),
+                      child: const Icon(
+                        Icons.camera_alt,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
               ],
             ),
-
-            // Content Section
             Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -231,8 +444,6 @@ class _PostDetailsState extends State<PostDetails> {
                         style: const TextStyle(color: Colors.red),
                       ),
                     ),
-
-                  // Title
                   if (_isEditing)
                     TextField(
                       controller: _titleController,
@@ -248,7 +459,8 @@ class _PostDetailsState extends State<PostDetails> {
                           borderSide: BorderSide(color: Colors.white30),
                         ),
                         focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: ThemeColors.primaryGreen),
+                          borderSide:
+                              BorderSide(color: ThemeColors.primaryGreen),
                         ),
                       ),
                     )
@@ -261,10 +473,7 @@ class _PostDetailsState extends State<PostDetails> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-
                   const SizedBox(height: 16),
-
-                  // Description
                   if (_isEditing)
                     TextField(
                       controller: _descriptionController,
@@ -281,7 +490,8 @@ class _PostDetailsState extends State<PostDetails> {
                           borderSide: BorderSide(color: Colors.white30),
                         ),
                         focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: ThemeColors.primaryGreen),
+                          borderSide:
+                              BorderSide(color: ThemeColors.primaryGreen),
                         ),
                       ),
                     )
@@ -294,10 +504,7 @@ class _PostDetailsState extends State<PostDetails> {
                         height: 1.5,
                       ),
                     ),
-
                   const SizedBox(height: 24),
-
-                  // Created At
                   Text(
                     'Created on ${DateFormat('MMM d, y').format(DateTime.parse(widget.createdAt))}',
                     style: TextStyle(

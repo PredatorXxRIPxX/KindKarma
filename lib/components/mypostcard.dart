@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:kindkarma/aside/MypostDetails.dart';
 
 class MyPostCard extends StatelessWidget {
+  final String id;
   final String title;
   final String description;
   final String postImage;
@@ -11,6 +12,7 @@ class MyPostCard extends StatelessWidget {
 
   const MyPostCard({
     super.key,
+    required this.id,
     required this.title,
     required this.description,
     required this.postImage,
@@ -49,7 +51,7 @@ class MyPostCard extends StatelessWidget {
 
     return InkWell(
       onTap: () {
-        Navigator.of(context).push(MaterialPageRoute(builder: (context) => PostDetails(title: title,description: description,postImage: postImage,createdAt: createdAt,) ));
+        Navigator.of(context).push(MaterialPageRoute(builder: (context) => PostDetails(id: id,title: title,description: description,postImage: postImage,createdAt: createdAt,) ));
       },
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),

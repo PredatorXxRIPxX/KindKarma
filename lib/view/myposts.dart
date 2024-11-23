@@ -58,6 +58,7 @@ class _MypostsState extends State<Myposts> {
           itemBuilder: (BuildContext context, int index) {
             final Document document = snapshot.data[index];
             return MyPostCard(
+              id: document.data["idpost"],
               title: document.data['title'],
               description: document.data['description'],
               postImage: document.data['postimage'],
