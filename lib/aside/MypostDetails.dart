@@ -71,6 +71,7 @@ class _PostDetailsState extends State<PostDetails> {
           queries: [
             Query.equal('idpost', widget.id),
           ]);
+      print(idDoc.documents.first.$id);
       database.updateDocument(
           databaseId: databaseid,
           collectionId: postCollectionid,
@@ -78,7 +79,7 @@ class _PostDetailsState extends State<PostDetails> {
           data: {
             'title': _titleController.text,
             'description': _descriptionController.text,
-            'created_at': DateTime.now().toIso8601String(),
+            'created_at': DateTime.now().toLocal(),
           });
 
       Navigator.pop(context, true);
@@ -90,7 +91,7 @@ class _PostDetailsState extends State<PostDetails> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Post updated successfully + image' ),
+            content: Text('Post updated successfully' ),
             backgroundColor: ThemeColors.primaryGreen,
           ),
         );
@@ -216,6 +217,9 @@ class _PostDetailsState extends State<PostDetails> {
             'postimage': fileId,
             'idpost': idPost,
           });
+        setState(() {
+          _isEditing = false;
+        });
       showSuccessSnackBar('Content added successfully updated image', context);
     } catch (e) {
       showErrorSnackBar('check your network connection', context);
