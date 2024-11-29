@@ -8,7 +8,6 @@ import 'package:kindkarma/controllers/userprovider.dart';
 import 'package:kindkarma/utils/notificationBuilder.dart';
 import 'package:kindkarma/utils/utility.dart';
 import 'package:provider/provider.dart';
-import 'dart:io';
 
 class PostDetails extends StatefulWidget {
   final String id;

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:animated_notch_bottom_bar/animated_notch_bottom_bar/animated_notch_bottom_bar.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:kindkarma/view/friendmessages.dart';
+import 'package:kindkarma/view/gpsdisable.dart';
 import 'package:kindkarma/view/mainpage.dart';
 import 'package:kindkarma/view/profile.dart';
 import 'package:kindkarma/view/addcontent.dart';
@@ -15,7 +17,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateMixin {
-  // Move constants to a separate class for better organization
+
   static const _UIConstants = _HomePageUIConstants();
   
   late final PageController _pageController;
@@ -24,7 +26,6 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
   int _currentPage = 0;
   bool _isPageViewAnimating = false;
 
-  // Define pages and navigation items as static const for better performance
   static const List<Widget> _pages = [
     MainPage(),
     Search(),
@@ -188,16 +189,42 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
     );
   }
 
+  Stream<bool> getLocation() {
+  return Stream.periodic(
+    const Duration(seconds: 1), 
+    (_) => Geolocator.isLocationServiceEnabled()
+  ).asyncMap((event) async => await event);
+}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ThemeColors.darkBackground,
       appBar: _buildAppBar(),
-      body: PageView(
-        controller: _pageController,
-        physics: const NeverScrollableScrollPhysics(),
-        onPageChanged: (index) => setState(() => _currentPage = index),
-        children: _pages,
+      body: StreamBuilder<bool>(
+        stream: getLocation(),
+        builder: (context, snapshot) {
+           if (snapshot.hasData && !snapshot.data!) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            Navigator.pushReplacement(
+              context, 
+              MaterialPageRoute(
+                builder: (context) => const Gpsdisable()
+              )
+            );
+          });
+          
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+          return PageView(
+            controller: _pageController,
+            physics: const NeverScrollableScrollPhysics(),
+            onPageChanged: (index) => setState(() => _currentPage = index),
+            children: _pages,
+          );
+        }
       ),
       extendBody: true,
       bottomNavigationBar: _buildBottomBar(),
@@ -205,7 +232,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
   }
 }
 
-// Separate class for UI constants
+
 class _HomePageUIConstants {
   final double bottomBarHeight = 75;
   final double bottomRadius = 28;
