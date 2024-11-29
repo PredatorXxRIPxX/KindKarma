@@ -51,7 +51,14 @@ class MyPostCard extends StatelessWidget {
 
     return InkWell(
       onTap: () {
-        Navigator.of(context).push(MaterialPageRoute(builder: (context) => PostDetails(id: id,title: title,description: description,postImage: postImage,createdAt: createdAt,) ));
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => PostDetails(
+                  id: id,
+                  title: title,
+                  description: description,
+                  postImage: postImage,
+                  createdAt: createdAt,
+                )));
       },
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -70,7 +77,8 @@ class MyPostCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(16)),
               child: Stack(
                 children: [
                   Image.network(
@@ -128,7 +136,7 @@ class MyPostCard extends StatelessWidget {
                 ],
               ),
             ),
-      
+
             // Content Section
             Padding(
               padding: const EdgeInsets.all(16),
@@ -145,9 +153,9 @@ class MyPostCard extends StatelessWidget {
                       letterSpacing: 0.5,
                     ),
                   ),
-                  
+
                   const SizedBox(height: 8),
-                  
+
                   // Description
                   Text(
                     description,
@@ -159,22 +167,17 @@ class MyPostCard extends StatelessWidget {
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  
+
                   const SizedBox(height: 16),
-                  
+
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Row(
                         children: [
                           _buildInteractionButton(
-                            Icons.favorite_border,
+                            Icons.remove_red_eye,
                             '24',
-                          ),
-                          const SizedBox(width: 16),
-                          _buildInteractionButton(
-                            Icons.chat_bubble_outline,
-                            '8',
                           ),
                         ],
                       ),

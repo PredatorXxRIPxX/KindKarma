@@ -49,6 +49,7 @@ dependencies:
   chat_bubbles: ^1.6.0
   timeago: ^3.7.0
   cached_network_image: ^3.4.1
+  geolocator: ^13.0.2
 
 dev_dependencies:
   flutter_test:
