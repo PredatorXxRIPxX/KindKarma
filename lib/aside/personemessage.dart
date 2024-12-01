@@ -53,9 +53,21 @@ class _PersoneMessageState extends State<PersoneMessage> {
           databaseId: databaseid,
           collectionId: chatCollectionid,
           queries: [
+            Query.or(
+              [
+                Query.and([
+                  Query.equal('sender_id', userprovider.userid),
+                  Query.equal('reciever_id', widget.author['iduser']),
+                ]),
+                Query.equal('sender_id', widget.author['iduser']),
+                Query.equal('reciever_id', userprovider.userid),
+              ],
+            ),
             Query.orderDesc('timestemp'),
             Query.limit(50),
           ]);
+      
+
       setState(() {
         messagesList = response.documents
             .map((e) => _createMessageBubble(e.data))
@@ -106,6 +118,16 @@ class _PersoneMessageState extends State<PersoneMessage> {
             'isImage': false
           });
 
+      setState(() {
+        messagesList.add(_createMessageBubble({
+          'message': _messageController.text.trim(),
+          'sender_id': userprovider.userid,
+          'reciever_id': widget.author['iduser'],
+          'timestemp': DateTime.now().toIso8601String(),
+          'isSeenByReciever': false,
+          'isImage': false
+        }));
+      });
       _messageController.clear();
       _scrollToBottom();
     } catch (e) {
@@ -122,6 +144,10 @@ class _PersoneMessageState extends State<PersoneMessage> {
         if (response.events.contains(
             'databases.$databaseid.collections.$chatCollectionid.documents.*')) {
           final message = response.payload;
+          if ((message['sender_id'] == userprovider.userid &&
+                  message['reciever_id'] == widget.author['iduser']) ||
+              (message['reciever_id'] == widget.author['iduser'] &&
+                  message['sender_id'] == userprovider.userid)) return;
           _addNewMessage(message);
         }
       }, onError: (error) {
