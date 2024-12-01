@@ -31,6 +31,7 @@ class _PersoneMessageState extends State<PersoneMessage> {
     receiver = widget.author;
     _fetchMessages();
     _setupRealtimeSubscription();
+    _setMessagesAsSeen();
   }
 
   @override
@@ -39,6 +40,47 @@ class _PersoneMessageState extends State<PersoneMessage> {
     _messageController.dispose();
     _subscription?.close();
     super.dispose();
+  }
+
+  Future<void> _markMessageAsSeen(Map<String, dynamic> messageData) async {
+  try {
+    await database.updateDocument(
+      databaseId: databaseid,
+      collectionId: chatCollectionid,
+      documentId: messageData['\$id'],
+      data: {
+        'isSeenByReciever': true,
+        'seenAt': DateTime.now().toIso8601String(),
+      },
+    );
+  } catch (e) {
+    print('Error marking message as seen: $e');
+  }
+}
+
+  Future _setMessagesAsSeen() async {
+    try {
+      final response = await database.listDocuments(
+          databaseId: databaseid,
+          collectionId: chatCollectionid,
+          queries: [
+            Query.and([
+              Query.equal('sender_id', widget.author['iduser']),
+              Query.equal('reciever_id', userprovider.userid),
+              Query.equal('isSeenByReciever', false),
+            ]),
+          ]);
+
+      for (final message in response.documents) {
+        await database.updateDocument(
+            databaseId: databaseid,
+            collectionId: chatCollectionid,
+            documentId: message.$id,
+            data: {'isSeenByReciever': true});
+      }
+    } catch (e) {
+      showErrorSnackBar('Unable to set messages as seen', context);
+    }
   }
 
   Future<void> _fetchMessages() async {
@@ -144,11 +186,23 @@ class _PersoneMessageState extends State<PersoneMessage> {
         if (response.events.contains(
             'databases.$databaseid.collections.$chatCollectionid.documents.*')) {
           final message = response.payload;
+
+          if ((message['sender_id'] == widget.author['iduser'] &&
+                  message['reciever_id'] == userprovider.userid) && 
+                  message['isSeenByReciever'] == false 
+              ) {
+            _markMessageAsSeen(message);
+              }
+
+
           if ((message['sender_id'] == userprovider.userid &&
                   message['reciever_id'] == widget.author['iduser']) ||
               (message['reciever_id'] == widget.author['iduser'] &&
                   message['sender_id'] == userprovider.userid)) return;
           _addNewMessage(message);
+
+          
+          
         }
       }, onError: (error) {
         showErrorSnackBar('Realtime connection lost', context);
