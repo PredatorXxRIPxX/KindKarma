@@ -236,7 +236,7 @@ class _CardDetailedState extends State<CardDetailed> {
         foregroundColor: surfaceColor,
         elevation: 4,
         onPressed: (){
-          Navigator.push(context, MaterialPageRoute(builder: (context) => Personemessage(author: widget.author,)));
+          Navigator.push(context, MaterialPageRoute(builder: (context) => PersoneMessage(author: widget.author,)));
         },
         child: const Icon(Icons.comment),
       ),

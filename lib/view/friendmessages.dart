@@ -49,7 +49,7 @@ class _FriendmessagesState extends State<Friendmessages> {
               Navigator.push(
                 context, 
                 MaterialPageRoute(
-                  builder: (context) => Personemessage(
+                  builder: (context) => PersoneMessage(
                     author: authorDoc.data,
                   )
                 )
