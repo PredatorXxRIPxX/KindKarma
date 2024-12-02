@@ -26,6 +26,7 @@ class _MainPageState extends State<MainPage> {
   @override
   void initState() {
     super.initState();
+    
     userProvider = Provider.of<Userprovider>(context, listen: false);
     _loadInitialData();
     _scrollController.addListener(_scrollListener);
@@ -43,6 +44,8 @@ class _MainPageState extends State<MainPage> {
       _loadMoreData();
     }
   }
+
+  
 
   Future<void> _loadInitialData() async {
     setState(() {

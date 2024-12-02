@@ -1,6 +1,12 @@
+import 'package:appwrite/appwrite.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:animated_notch_bottom_bar/animated_notch_bottom_bar/animated_notch_bottom_bar.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:kindkarma/api/api.dart';
+import 'package:kindkarma/controllers/userprovider.dart';
+import 'package:kindkarma/main.dart';
+import 'package:kindkarma/utils/notificationBuilder.dart';
 import 'package:kindkarma/view/friendmessages.dart';
 import 'package:kindkarma/view/gpsdisable.dart';
 import 'package:kindkarma/view/mainpage.dart';
@@ -8,6 +14,7 @@ import 'package:kindkarma/view/profile.dart';
 import 'package:kindkarma/view/addcontent.dart';
 import 'package:kindkarma/view/myposts.dart';
 import 'package:kindkarma/view/search.dart';
+import 'package:provider/provider.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -16,13 +23,16 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateMixin {
-
+class _MyHomePageState extends State<MyHomePage>
+    with SingleTickerProviderStateMixin {
   static const _UIConstants = _HomePageUIConstants();
-  
+  RealtimeSubscription? _subscription;
   late final PageController _pageController;
   late final NotchBottomBarController _bottomBarController;
+  late bool isNotificationEnabed;
   
+  late Userprovider userprovider;
+
   int _currentPage = 0;
   bool _isPageViewAnimating = false;
 
@@ -34,51 +44,103 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
     Profile(),
   ];
 
+  static Future<void> _handleNotificationTap(ReceivedAction receivedAction) async {
+    if (receivedAction.payload != null && receivedAction.payload!['message'] != null) {
+      navigatorKey.currentState?.pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => const Friendmessages()
+        )
+      );
+    }
+  }
+
   static const List<NavigationItemData> _navigationItems = [
     NavigationItemData(
-      activeIcon: Icons.home_rounded,
-      inactiveIcon: Icons.home_outlined,
-      label: 'Home'
-    ),
+        activeIcon: Icons.home_rounded,
+        inactiveIcon: Icons.home_outlined,
+        label: 'Home'),
     NavigationItemData(
-      activeIcon: Icons.search_rounded,
-      inactiveIcon: Icons.search_outlined,
-      label: 'Search'
-    ),
+        activeIcon: Icons.search_rounded,
+        inactiveIcon: Icons.search_outlined,
+        label: 'Search'),
     NavigationItemData(
-      activeIcon: Icons.add_circle_rounded,
-      inactiveIcon: Icons.add_circle_outline_rounded,
-      label: 'Add'
-    ),
+        activeIcon: Icons.add_circle_rounded,
+        inactiveIcon: Icons.add_circle_outline_rounded,
+        label: 'Add'),
     NavigationItemData(
-      activeIcon: Icons.bookmark_rounded,
-      inactiveIcon: Icons.bookmark_outline,
-      label: 'My Posts'
-    ),
+        activeIcon: Icons.bookmark_rounded,
+        inactiveIcon: Icons.bookmark_outline,
+        label: 'My Posts'),
     NavigationItemData(
-      activeIcon: Icons.person_rounded,
-      inactiveIcon: Icons.person_outline_rounded,
-      label: 'Profile'
-    ),
+        activeIcon: Icons.person_rounded,
+        inactiveIcon: Icons.person_outline_rounded,
+        label: 'Profile'),
   ];
+
+  Future<void> _checknotifications() async {
+    isNotificationEnabed = await AwesomeNotifications().isNotificationAllowed();
+    if (! isNotificationEnabed) {
+      isNotificationEnabed = await AwesomeNotifications().requestPermissionToSendNotifications();
+    }
+  }
+
+  void _setupsubscription() {
+    try {
+      _subscription = realtime.subscribe(
+          ['databases.$databaseid.collections.$chatCollectionid.documents']);
+      _subscription!.stream.listen((event) {
+        if (event.events.contains(
+            'databases.$databaseid.collections.$chatCollectionid.documents.*')) {
+          final message = event.payload;
+          if (message['reciever_id'] == userprovider.userid) {
+            if (isNotificationEnabed) {
+              AwesomeNotifications().createNotification(
+                  content: NotificationContent(
+                      id: 10,
+                      channelKey: 'basic_channel',
+                      title: 'New Message Recieved',
+                      notificationLayout: NotificationLayout.Messaging,
+                      body: message['message']));
+
+            }
+          }
+        }
+      });
+      AwesomeNotifications().setListeners(
+        onActionReceivedMethod: _handleNotificationTap,
+      );
+
+      int notifcations = userprovider.notifications + 1;
+      userprovider.setNotifications(notifcations);
+
+      
+    } catch (e) {
+      showErrorSnackBar("Enable to send you notifications", context);
+    }
+  }
 
   @override
   void initState() {
     super.initState();
+    userprovider = Provider.of<Userprovider>(context, listen: false);
+    print('userprovider from home $userprovider.userid');
     _pageController = PageController(initialPage: _currentPage);
     _bottomBarController = NotchBottomBarController(index: _currentPage);
+    _setupsubscription();
+    _checknotifications();
   }
 
   @override
   void dispose() {
     _pageController.dispose();
     _bottomBarController.dispose();
+    _subscription?.close();
     super.dispose();
   }
 
   Future<void> _handlePageChange(int index) async {
     if (_isPageViewAnimating) return;
-    
+
     setState(() {
       _isPageViewAnimating = true;
       _currentPage = index;
@@ -116,7 +178,8 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
             decoration: BoxDecoration(
               color: ThemeColors.accentColor.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: ThemeColors.accentColor.withOpacity(0.3)),
+              border:
+                  Border.all(color: ThemeColors.accentColor.withOpacity(0.3)),
             ),
             child: const Padding(
               padding: EdgeInsets.all(8),
@@ -169,13 +232,15 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
         kIconSize: _UIConstants.iconSize,
         onTap: _handlePageChange,
         bottomBarItems: _navigationItems
-            .map((item) => _buildBottomBarItem(item.activeIcon, item.inactiveIcon))
+            .map((item) =>
+                _buildBottomBarItem(item.activeIcon, item.inactiveIcon))
             .toList(),
       ),
     );
   }
 
-  BottomBarItem _buildBottomBarItem(IconData activeIcon, IconData inactiveIcon) {
+  BottomBarItem _buildBottomBarItem(
+      IconData activeIcon, IconData inactiveIcon) {
     return BottomBarItem(
       inActiveItem: Icon(
         inactiveIcon,
@@ -190,11 +255,10 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
   }
 
   Stream<bool> getLocation() {
-  return Stream.periodic(
-    const Duration(seconds: 1), 
-    (_) => Geolocator.isLocationServiceEnabled()
-  ).asyncMap((event) async => await event);
-}
+    return Stream.periodic(const Duration(seconds: 1),
+            (_) => Geolocator.isLocationServiceEnabled())
+        .asyncMap((event) async => await event);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -202,36 +266,32 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
       backgroundColor: ThemeColors.darkBackground,
       appBar: _buildAppBar(),
       body: StreamBuilder<bool>(
-        stream: getLocation(),
-        builder: (context, snapshot) {
-           if (snapshot.hasData && !snapshot.data!) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            Navigator.pushReplacement(
-              context, 
-              MaterialPageRoute(
-                builder: (context) => const Gpsdisable()
-              )
+          stream: getLocation(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData && !snapshot.data!) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const Gpsdisable()));
+              });
+
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+            return PageView(
+              controller: _pageController,
+              physics: const NeverScrollableScrollPhysics(),
+              onPageChanged: (index) => setState(() => _currentPage = index),
+              children: _pages,
             );
-          });
-          
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-          return PageView(
-            controller: _pageController,
-            physics: const NeverScrollableScrollPhysics(),
-            onPageChanged: (index) => setState(() => _currentPage = index),
-            children: _pages,
-          );
-        }
-      ),
+          }),
       extendBody: true,
       bottomNavigationBar: _buildBottomBar(),
     );
   }
 }
-
 
 class _HomePageUIConstants {
   final double bottomBarHeight = 75;
@@ -254,12 +314,22 @@ class NavigationItemData {
   });
 }
 
-
-class _MessageButton extends StatelessWidget {
+class _MessageButton extends StatefulWidget {
   final VoidCallback onTap;
 
   const _MessageButton({required this.onTap});
 
+  @override
+  State<_MessageButton> createState() => _MessageButtonState();
+}
+
+class _MessageButtonState extends State<_MessageButton> {
+  late Userprovider _userprovider;
+  @override
+  void initState() {
+    _userprovider = Provider.of<Userprovider>(context, listen: false);
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -270,9 +340,9 @@ class _MessageButton extends StatelessWidget {
             color: Colors.white,
             size: 24,
           ),
-          onPressed: onTap,
+          onPressed: widget.onTap,
         ),
-        Positioned(
+        if(_userprovider.notifications!= 0)Positioned(
           right: 8,
           top: 8,
           child: Container(
@@ -281,9 +351,9 @@ class _MessageButton extends StatelessWidget {
               color: ThemeColors.primaryGreen,
               shape: BoxShape.circle,
             ),
-            child: const Text(
-              '2',
-              style: TextStyle(
+            child: Text(
+              _userprovider.notifications.toString(),
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 10,
                 fontWeight: FontWeight.bold,

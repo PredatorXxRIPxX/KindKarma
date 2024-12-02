@@ -54,7 +54,7 @@ class _PersoneMessageState extends State<PersoneMessage> {
       },
     );
   } catch (e) {
-    print('Error marking message as seen: $e');
+    showInfoSnackBar('Enable to make message as seen', context);
   }
 }
 

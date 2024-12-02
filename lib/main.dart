@@ -2,11 +2,32 @@ import 'package:flutter/material.dart';
 import 'package:kindkarma/auth/forgot.dart';
 import 'package:kindkarma/auth/login.dart';
 import 'package:kindkarma/auth/signup.dart';
+import 'package:kindkarma/utils/utility.dart';
 import 'package:kindkarma/view/home.dart';
 import 'package:provider/provider.dart';
 import 'package:kindkarma/controllers/userprovider.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
 
-void main() {
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+Future <void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await AwesomeNotifications().initialize(
+    null,
+    [
+      NotificationChannel(
+        channelKey: 'basic_channel',
+        channelName: 'Basic Notifications',
+        channelDescription: 'Channel for basic notifications',
+        defaultColor: surfaceColor,
+        importance: NotificationImportance.High,
+        ledColor: Colors.white,
+      )
+    ],
+    debug: true,
+  );
+
   runApp(
     ChangeNotifierProvider(
       create: (context) => Userprovider(),
@@ -22,6 +43,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      navigatorKey: navigatorKey,
       title: 'Kindkarma',
       theme: ThemeData(
         primarySwatch: Colors.green,

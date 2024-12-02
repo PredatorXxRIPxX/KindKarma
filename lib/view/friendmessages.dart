@@ -74,6 +74,7 @@ class _FriendmessagesState extends State<Friendmessages> {
   @override
   void initState() {
     userProvider = Provider.of<Userprovider>(context, listen: false);
+    userProvider.setNotifications(0);
     super.initState();
   }
 
