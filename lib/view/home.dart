@@ -123,7 +123,6 @@ class _MyHomePageState extends State<MyHomePage>
   void initState() {
     super.initState();
     userprovider = Provider.of<Userprovider>(context, listen: false);
-    print('userprovider from home $userprovider.userid');
     _pageController = PageController(initialPage: _currentPage);
     _bottomBarController = NotchBottomBarController(index: _currentPage);
     _setupsubscription();

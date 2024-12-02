@@ -19,6 +19,7 @@ class _LoginState extends State<Login> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  late Userprovider _userprovider;
 
   bool isVisible = false;
   bool isLoading = false;
@@ -36,7 +37,7 @@ class _LoginState extends State<Login> {
   setState(() => isLoading = true);
 
   try {
-    final Userprovider userprovider =
+    _userprovider =
         Provider.of<Userprovider>(context, listen: false);
 
     try {
@@ -54,15 +55,14 @@ class _LoginState extends State<Login> {
     final user = await account.get();
 
     DocumentList documentList = await database.listDocuments(databaseId: databaseid, collectionId: userCollectionid,queries: [
-      Query.select(['iduser']),
+      Query.select(['iduser','username']),
       Query.equal('email',user.email),
     ]);
 
-    userprovider.setUserid(documentList.documents[0].data['iduser']);
-    userprovider.setEmail(user.email);
-    userprovider.setUsername(user.name);
+    _userprovider.setUserid(documentList.documents[0].data['iduser']);
+    _userprovider.setEmail(user.email);
+    _userprovider.setUsername(documentList.documents[0].data['username']);
     
-    print(userprovider.userid);
     if (mounted) {
       showSuccessSnackBar('Login successful!', context);
       Navigator.pushReplacementNamed(context, '/home');

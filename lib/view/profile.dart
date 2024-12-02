@@ -13,8 +13,7 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
-  late String email;
-  late String username;
+  late Userprovider userprovider;
 
   Future <void> logout(BuildContext context) async {
     try {
@@ -38,9 +37,7 @@ class _ProfileState extends State<Profile> {
   @override
   void initState() {
     super.initState();
-    final Userprovider userprovider = Provider.of<Userprovider>(context, listen: false);
-    email = userprovider.email;
-    username = userprovider.username;
+    userprovider = Provider.of<Userprovider>(context, listen: false);
   }
 
   @override
@@ -78,7 +75,7 @@ class _ProfileState extends State<Profile> {
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      username, 
+                      userprovider.username, 
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 20,
@@ -124,7 +121,7 @@ class _ProfileState extends State<Profile> {
                     style: TextStyle(color: Colors.white, fontSize: 20)
                   ),
                   subtitle: Text(
-                    email,
+                    userprovider.email,
                     style: const TextStyle(color: Colors.white70, fontSize: 16),
                   ),
                 ),
