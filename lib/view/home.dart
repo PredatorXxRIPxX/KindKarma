@@ -85,8 +85,10 @@ class _MyHomePageState extends State<MyHomePage>
   }
 
   void _setupsubscription() {
+    String databaseid = AppwriteService.databaseId;
+    String chatCollectionid = AppwriteService.chatCollectionId;
     try {
-      _subscription = realtime.subscribe(
+      _subscription = AppwriteService.realtime.subscribe(
           ['databases.$databaseid.collections.$chatCollectionid.documents']);
       _subscription!.stream.listen((event) {
         if (event.events.contains(

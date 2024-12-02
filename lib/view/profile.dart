@@ -17,7 +17,7 @@ class _ProfileState extends State<Profile> {
 
   Future <void> logout(BuildContext context) async {
     try {
-      await account.deleteSessions();
+      await AppwriteService.account.deleteSessions();
     } catch (e) {
       AlertDialog(
         title: const Text('Error'),

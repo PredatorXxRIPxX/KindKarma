@@ -7,12 +7,13 @@ import 'package:kindkarma/view/home.dart';
 import 'package:provider/provider.dart';
 import 'package:kindkarma/controllers/userprovider.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
-
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-Future <void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
 
+Future<void> main() async {
+  await dotenv.load(fileName: ".env");
+  WidgetsFlutterBinding.ensureInitialized();
   await AwesomeNotifications().initialize(
     null,
     [
@@ -20,14 +21,14 @@ Future <void> main() async {
         channelKey: 'basic_channel',
         channelName: 'Basic Notifications',
         channelDescription: 'Channel for basic notifications',
-        defaultColor: surfaceColor,
+        defaultColor: primaryGreen,
         importance: NotificationImportance.High,
-        ledColor: Colors.white,
+        ledColor: surfaceColor,
       )
     ],
     debug: true,
   );
-
+  
   runApp(
     ChangeNotifierProvider(
       create: (context) => Userprovider(),
@@ -47,7 +48,6 @@ class MyApp extends StatelessWidget {
       title: 'Kindkarma',
       theme: ThemeData(
         primarySwatch: Colors.green,
-        
       ),
       initialRoute: '/login',
       routes: {

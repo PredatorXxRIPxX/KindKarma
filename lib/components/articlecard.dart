@@ -40,6 +40,10 @@ class ArticleCard extends StatelessWidget {
   }
 
     String getImageViewLink(String image) {
+      String setEndpoint = AppwriteService.setEndpoint;
+      String storageid = AppwriteService.storageId;
+      String projectid = AppwriteService.projectId;
+
       return '$setEndpoint/storage/buckets/$storageid/files/$image/view?project=670d353b0011112ac560&project=$projectid&mode=admin';
     }
 

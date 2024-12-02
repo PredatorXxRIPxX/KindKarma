@@ -18,9 +18,9 @@ class _FriendmessagesState extends State<Friendmessages> {
   late Userprovider userProvider;
 
   Future<Document> getAuthor(String receiverId) async {
-    final response = await database.listDocuments(
-      databaseId: databaseid, 
-      collectionId: userCollectionid,
+    final response = await AppwriteService.databases.listDocuments(
+      databaseId: AppwriteService.databaseId, 
+      collectionId: AppwriteService.userCollectionId,
       queries: [Query.equal('iduser', receiverId)]
     );
     return response.documents.first;
@@ -28,9 +28,9 @@ class _FriendmessagesState extends State<Friendmessages> {
 
   Stream<List<ListTile>> _getUsers() async* {
     try {
-      final response = await database.listDocuments(
-        databaseId: databaseid, 
-        collectionId: chatCollectionid,
+      final response = await AppwriteService.databases.listDocuments(
+        databaseId: AppwriteService.databaseId, 
+        collectionId: AppwriteService.chatCollectionId,
         queries: [Query.select(['reciever_id'])]
       );
       

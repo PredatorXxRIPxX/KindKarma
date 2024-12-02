@@ -20,9 +20,9 @@ class _MypostsState extends State<Myposts> {
 
   Future<List<Document>> getPosts() async {
     try {
-      final documents = await database.listDocuments(
-        databaseId: databaseid,
-        collectionId: postCollectionid,
+      final documents = await AppwriteService.databases.listDocuments(
+        databaseId: AppwriteService.databaseId,
+        collectionId: AppwriteService.postCollectionId,
         queries: [
           Query.equal('user', userid),
         ],

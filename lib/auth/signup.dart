@@ -43,9 +43,9 @@ class _SignUpState extends State<SignUp> {
     setState(() => isLoading = true);
 
     try {
-      DocumentList documentList = await database.listDocuments(
-        databaseId: databaseid, 
-        collectionId: userCollectionid,
+      DocumentList documentList = await AppwriteService.databases.listDocuments(
+        databaseId: AppwriteService.databaseId, 
+        collectionId: AppwriteService.userCollectionId,
         queries: [
           Query.equal('email', email)
         ]
@@ -57,15 +57,15 @@ class _SignUpState extends State<SignUp> {
       }
 
       final id = ID.unique();
-      await account.create(
+      await AppwriteService.account.create(
         userId: id,
         email: email,
         password: password,
       );
 
-      await database.createDocument(
-        databaseId: databaseid,
-        collectionId: userCollectionid,
+      await AppwriteService.databases.createDocument(
+        databaseId: AppwriteService.databaseId,
+        collectionId: AppwriteService.userCollectionId,
         documentId: id,
         data: {
           'iduser': id,

@@ -94,9 +94,9 @@ class _MainPageState extends State<MainPage> {
 
   Future<List<Document>> _fetchDocuments() async {
     try {
-      final documents = await database.listDocuments(
-        databaseId: databaseid,
-        collectionId: postCollectionid,
+      final documents = await AppwriteService.databases.listDocuments(
+        databaseId: AppwriteService.databaseId,
+        collectionId: AppwriteService.postCollectionId,
         queries: [
           Query.notEqual('user', userProvider.userid),
           Query.orderDesc('created_at'),

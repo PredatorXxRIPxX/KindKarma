@@ -44,9 +44,9 @@ class _PersoneMessageState extends State<PersoneMessage> {
 
   Future<void> _markMessageAsSeen(Map<String, dynamic> messageData) async {
   try {
-    await database.updateDocument(
-      databaseId: databaseid,
-      collectionId: chatCollectionid,
+    await AppwriteService.databases.updateDocument(
+      databaseId: AppwriteService.databaseId,
+      collectionId: AppwriteService.chatCollectionId,
       documentId: messageData['\$id'],
       data: {
         'isSeenByReciever': true,
@@ -54,15 +54,15 @@ class _PersoneMessageState extends State<PersoneMessage> {
       },
     );
   } catch (e) {
-    showInfoSnackBar('Enable to make message as seen', context);
+    print("Error: $e");
   }
 }
 
   Future _setMessagesAsSeen() async {
     try {
-      final response = await database.listDocuments(
-          databaseId: databaseid,
-          collectionId: chatCollectionid,
+      final response = await AppwriteService.databases.listDocuments(
+          databaseId: AppwriteService.databaseId,
+          collectionId: AppwriteService.chatCollectionId,
           queries: [
             Query.and([
               Query.equal('sender_id', widget.author['iduser']),
@@ -72,9 +72,9 @@ class _PersoneMessageState extends State<PersoneMessage> {
           ]);
 
       for (final message in response.documents) {
-        await database.updateDocument(
-            databaseId: databaseid,
-            collectionId: chatCollectionid,
+        await AppwriteService.databases.updateDocument(
+            databaseId: AppwriteService.databaseId,
+            collectionId: AppwriteService.chatCollectionId,
             documentId: message.$id,
             data: {'isSeenByReciever': true});
       }
@@ -91,9 +91,9 @@ class _PersoneMessageState extends State<PersoneMessage> {
     });
 
     try {
-      final response = await database.listDocuments(
-          databaseId: databaseid,
-          collectionId: chatCollectionid,
+      final response = await AppwriteService.databases.listDocuments(
+          databaseId: AppwriteService.databaseId,
+          collectionId: AppwriteService.chatCollectionId,
           queries: [
             Query.or(
               [
@@ -147,9 +147,9 @@ class _PersoneMessageState extends State<PersoneMessage> {
     if (_messageController.text.trim().isEmpty) return;
 
     try {
-      await database.createDocument(
-          databaseId: databaseid,
-          collectionId: chatCollectionid,
+      await AppwriteService.databases.createDocument(
+          databaseId: AppwriteService.databaseId,
+          collectionId: AppwriteService.chatCollectionId,
           documentId: ID.unique(),
           data: {
             'message': _messageController.text.trim(),
@@ -179,7 +179,9 @@ class _PersoneMessageState extends State<PersoneMessage> {
 
   void _setupRealtimeSubscription() {
     try {
-      _subscription = realtime.subscribe(
+      String databaseid = AppwriteService.databaseId;
+      String chatCollectionid = AppwriteService.chatCollectionId;
+      _subscription = AppwriteService.realtime.subscribe(
           ['databases.$databaseid.collections.$chatCollectionid.documents']);
 
       _subscription?.stream.listen((response) {

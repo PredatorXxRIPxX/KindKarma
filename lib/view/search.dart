@@ -52,9 +52,9 @@ class _SearchState extends State<Search> {
       });
 
       try {
-        final response = await database.listDocuments(
-          databaseId: databaseid,
-          collectionId: postCollectionid,
+        final response = await AppwriteService.databases.listDocuments(
+          databaseId: AppwriteService.databaseId,
+          collectionId: AppwriteService.postCollectionId,
           queries: [
             Query.search('title', _currentQuery),
             Query.limit(limit),
@@ -100,9 +100,9 @@ class _SearchState extends State<Search> {
     });
 
     try {
-      final response = await database.listDocuments(
-        databaseId: databaseid,
-        collectionId: postCollectionid,
+      final response = await AppwriteService.databases.listDocuments(
+        databaseId: AppwriteService.databaseId,
+        collectionId: AppwriteService.postCollectionId,
         queries: [
           Query.search('title', query),
           Query.limit(limit),

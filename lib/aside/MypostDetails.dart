@@ -54,6 +54,9 @@ class _PostDetailsState extends State<PostDetails> {
   }
 
   String _getImageViewLink(String image) {
+    String storageid = AppwriteService.storageId;
+    String projectid = AppwriteService.projectId;
+    String setEndpoint = AppwriteService.setEndpoint;
     return '$setEndpoint/storage/buckets/$storageid/files/$image/view?project=670d353b0011112ac560&project=$projectid&mode=admin';
   }
 
@@ -86,17 +89,17 @@ class _PostDetailsState extends State<PostDetails> {
   }
 
   Future<DocumentList> _findPostDocument() async {
-    return await database.listDocuments(
-      databaseId: databaseid,
-      collectionId: postCollectionid,
+    return await AppwriteService.databases.listDocuments(
+      databaseId: AppwriteService.databaseId,
+      collectionId: AppwriteService.postCollectionId,
       queries: [Query.equal('idpost', widget.id)],
     );
   }
 
   Future<void> _performPostUpdate(DocumentList idDoc) async {
-    await database.updateDocument(
-      databaseId: databaseid,
-      collectionId: postCollectionid,
+    await AppwriteService.databases.updateDocument(
+      databaseId: AppwriteService.databaseId,
+      collectionId: AppwriteService.postCollectionId,
       documentId: idDoc.documents.first.$id,
       data: {
         'title': _titleController.text.trim(),
@@ -157,16 +160,16 @@ class _PostDetailsState extends State<PostDetails> {
   }
 
   Future<void> _deleteExistingImage(DocumentList docid) async {
-    await storage.deleteFile(
-      bucketId: storageid, 
+    await AppwriteService.storage.deleteFile(
+      bucketId: AppwriteService.storageId, 
       fileId: docid.documents.first.data['postimage']
     );
   }
 
   Future<String> _uploadNewImage() async {
     final fileId = ID.unique();
-    await storage.createFile(
-      bucketId: storageid,
+    await AppwriteService.storage.createFile(
+      bucketId: AppwriteService.storageId,
       fileId: fileId,
       file: InputFile.fromPath(path: _image!.path)
     );
@@ -174,9 +177,9 @@ class _PostDetailsState extends State<PostDetails> {
   }
 
   Future<void> _updatePostWithNewImage(DocumentList docid, String fileId) async {
-    await database.updateDocument(
-      databaseId: databaseid,
-      collectionId: postCollectionid,
+    await AppwriteService.databases.updateDocument(
+      databaseId: AppwriteService.databaseId,
+      collectionId: AppwriteService.postCollectionId,
       documentId: docid.documents.first.$id,
       data: {
         'title': _titleController.text,
@@ -242,9 +245,9 @@ class _PostDetailsState extends State<PostDetails> {
   }
 
   Future<void> _performPostDeletion(DocumentList idDoc) async {
-    await database.deleteDocument(
-      databaseId: databaseid,
-      collectionId: postCollectionid,
+    await AppwriteService.databases.deleteDocument(
+      databaseId: AppwriteService.databaseId,
+      collectionId: AppwriteService.postCollectionId,
       documentId: idDoc.documents.first.$id,
     );
   }

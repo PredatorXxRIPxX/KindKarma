@@ -40,21 +40,21 @@ class _LoginState extends State<Login> {
       _userprovider = Provider.of<Userprovider>(context, listen: false);
 
       try {
-        await account.deleteSessions();
+        await AppwriteService.account.deleteSessions();
       } catch (e) {
         showErrorSnackBar('An unexpected error occurred', context);
       }
 
-      await account.createEmailPasswordSession(
+      await  AppwriteService.account.createEmailPasswordSession(
         email: _emailController.text.trim(),
         password: _passwordController.text,
       );
 
-      final user = await account.get();
+      final user = await AppwriteService.account.get();
 
-      DocumentList documentList = await database.listDocuments(
-          databaseId: databaseid,
-          collectionId: userCollectionid,
+      DocumentList documentList = await AppwriteService.databases.listDocuments(
+          databaseId: AppwriteService.databaseId,
+          collectionId: AppwriteService.userCollectionId,
           queries: [
             Query.select(['iduser', 'username']),
             Query.equal('email', user.email),

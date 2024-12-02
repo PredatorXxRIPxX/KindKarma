@@ -106,14 +106,14 @@ class _AddContentState extends State<AddContent> {
       final fileId = ID.unique();
       final idPost = ID.unique();
 
-      await storage.createFile(
-          bucketId: storageid,
+      await AppwriteService.storage.createFile(
+          bucketId: AppwriteService.storageId,
           fileId: fileId,
           file: InputFile.fromPath(path: image!.path));
 
-      await database.createDocument(
-          databaseId: databaseid,
-          collectionId: postCollectionid,
+      await AppwriteService.databases.createDocument(
+          databaseId: AppwriteService.databaseId,
+          collectionId: AppwriteService.postCollectionId,
           documentId: idPost,
           data: {
             'title': title,
