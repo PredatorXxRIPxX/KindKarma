@@ -32,57 +32,56 @@ class _LoginState extends State<Login> {
   }
 
   Future<void> login() async {
-  if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) return;
 
-  setState(() => isLoading = true);
-
-  try {
-    _userprovider =
-        Provider.of<Userprovider>(context, listen: false);
+    setState(() => isLoading = true);
 
     try {
-      await account.deleteSessions();
+      _userprovider = Provider.of<Userprovider>(context, listen: false);
+
+      try {
+        await account.deleteSessions();
+      } catch (e) {
+        showErrorSnackBar('An unexpected error occurred', context);
+      }
+
+      await account.createEmailPasswordSession(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+      );
+
+      final user = await account.get();
+
+      DocumentList documentList = await database.listDocuments(
+          databaseId: databaseid,
+          collectionId: userCollectionid,
+          queries: [
+            Query.select(['iduser', 'username']),
+            Query.equal('email', user.email),
+          ]);
+
+      _userprovider.setUserid(documentList.documents[0].data['iduser']);
+      _userprovider.setEmail(user.email);
+      _userprovider.setUsername(documentList.documents[0].data['username']);
+
+      if (mounted) {
+        showSuccessSnackBar('Login successful!', context);
+        Navigator.pushReplacementNamed(context, '/home');
+      }
+    } on AppwriteException catch (e) {
+      if (mounted) {
+        showErrorSnackBar(e.message ?? 'Login failed', context);
+      }
     } catch (e) {
-      showErrorSnackBar('An unexpected error occurred',context);
-    }
-
-    await account.createEmailPasswordSession(
-      email: _emailController.text.trim(),
-      password: _passwordController.text,
-    );
-
-    
-    final user = await account.get();
-
-    DocumentList documentList = await database.listDocuments(databaseId: databaseid, collectionId: userCollectionid,queries: [
-      Query.select(['iduser','username']),
-      Query.equal('email',user.email),
-    ]);
-
-    _userprovider.setUserid(documentList.documents[0].data['iduser']);
-    _userprovider.setEmail(user.email);
-    _userprovider.setUsername(documentList.documents[0].data['username']);
-    
-    if (mounted) {
-      showSuccessSnackBar('Login successful!', context);
-      Navigator.pushReplacementNamed(context, '/home');
-    }
-  } on AppwriteException catch (e) {
-    if (mounted) {
-      showErrorSnackBar(e.message ?? 'Login failed', context);
-    }
-  } catch (e) {
-    if (mounted) {
-      showErrorSnackBar('An unexpected error occurred',context);
-    }
-  } finally {
-    if (mounted) {
-      setState(() => isLoading = false);
+      if (mounted) {
+        showErrorSnackBar('An unexpected error occurred', context);
+      }
+    } finally {
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
     }
   }
-}
-
-  
 
   InputDecoration _inputDecoration({
     required String hint,
